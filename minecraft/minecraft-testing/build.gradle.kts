@@ -1,0 +1,10 @@
+plugins {
+    java
+}
+
+dependencies {
+
+}
+repositories {
+
+}

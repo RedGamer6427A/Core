@@ -1,0 +1,34 @@
+import java.net.URI
+
+plugins {
+    id("java")
+    id("com.gradleup.shadow") version "9.1.0"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
+}
+
+group = "dev.redgamer6427a.core.mc"
+version = "2.0.0"
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = URI("https://repo.papermc.io/repository/maven-public/")
+    }
+}
+
+dependencies {
+    implementation(project(":core"))
+    implementation(project(":minecraft:common"))
+    paperweight.paperDevBundle("26.1.1.build.+")
+
+}
+
+tasks.processResources {
+    val props = mapOf("version" to project.version.toString())
+    inputs.properties(props)
+    filteringCharset = "UTF-8"
+    filesMatching("paper-plugin.yml") {
+        expand(props)
+    }
+}

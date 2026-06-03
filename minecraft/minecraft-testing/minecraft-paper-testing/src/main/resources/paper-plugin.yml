@@ -1,0 +1,7 @@
+name: CorePaperTest
+version: ${version}
+main: dev.redgamer6427a.core.minecraft.paper.test.TestPlugin
+api-version: '26.1.1'
+load: STARTUP
+authors: [RedGamer6427A]
+description: Testing core.minecraft.paper
