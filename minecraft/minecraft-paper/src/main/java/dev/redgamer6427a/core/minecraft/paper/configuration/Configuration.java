@@ -48,7 +48,7 @@ public abstract class Configuration extends AbstractConfigurationSection {
 
     @Override
     public String toString() {
-        return "CrossbowConfiguration[" + file.getName() + ", " + children.toString() + "]";
+        return "YamlConfiguration[" + file.getName() + ", " + children.toString() + "]";
     }
 
     public void load() {
