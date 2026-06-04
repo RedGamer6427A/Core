@@ -1,8 +1,8 @@
-package dev.redgamer6427a.admiral.paper.player.modules;
+package dev.redgamer6427a.core.minecraft.paper.player.modules;
 
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
-import dev.redgamer6427a.admiral.paper.player.ExtendedPlayer;
-import dev.redgamer6427a.admiral.paper.player.PlayerModule;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
+import dev.redgamer6427a.core.minecraft.paper.player.ExtendedPlayer;
+import dev.redgamer6427a.core.minecraft.paper.player.PlayerModule;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
@@ -17,56 +17,56 @@ public final class PDCModule extends PlayerModule {
     }
 
     public void setString(String id, String value) {
-        player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(AdmiralPlugin.getInstance(), id), PersistentDataType.STRING, value);
+        player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(PaperPlugin.getInstance(), id), PersistentDataType.STRING, value);
         }
 
         public void setDouble(String id, double value) {
-            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(AdmiralPlugin.getInstance(), id), PersistentDataType.DOUBLE, value);
+            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(PaperPlugin.getInstance(), id), PersistentDataType.DOUBLE, value);
         }
 
         public void setFloat(String id, float value) {
-            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(AdmiralPlugin.getInstance(), id), PersistentDataType.FLOAT, value);
+            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(PaperPlugin.getInstance(), id), PersistentDataType.FLOAT, value);
         }
 
         public void setInt(String id, int value) {
-            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(AdmiralPlugin.getInstance(), id), PersistentDataType.INTEGER, value);
+            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(PaperPlugin.getInstance(), id), PersistentDataType.INTEGER, value);
         }
 
         public void setBoolean(String id, boolean value) {
-            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(AdmiralPlugin.getInstance(), id), PersistentDataType.BOOLEAN, value);
+            player.getPlayer().getPersistentDataContainer().set(new NamespacedKey(PaperPlugin.getInstance(), id), PersistentDataType.BOOLEAN, value);
         }
 
         public String getString(String id) {
             return player.getPlayer().getPersistentDataContainer().get(
-                    new NamespacedKey(AdmiralPlugin.getInstance(), id),
+                    new NamespacedKey(PaperPlugin.getInstance(), id),
                     PersistentDataType.STRING
             );
         }
 
         public Double getDouble(String id) {
             return player.getPlayer().getPersistentDataContainer().get(
-                    new NamespacedKey(AdmiralPlugin.getInstance(), id),
+                    new NamespacedKey(PaperPlugin.getInstance(), id),
                     PersistentDataType.DOUBLE
             );
         }
 
         public Float getFloat(String id) {
             return player.getPlayer().getPersistentDataContainer().get(
-                    new NamespacedKey(AdmiralPlugin.getInstance(), id),
+                    new NamespacedKey(PaperPlugin.getInstance(), id),
                     PersistentDataType.FLOAT
             );
         }
 
         public Integer getInt(String id) {
             return player.getPlayer().getPersistentDataContainer().get(
-                    new NamespacedKey(AdmiralPlugin.getInstance(), id),
+                    new NamespacedKey(PaperPlugin.getInstance(), id),
                     PersistentDataType.INTEGER
             );
         }
 
         public Boolean getBoolean(String id) {
             return player.getPlayer().getPersistentDataContainer().get(
-                    new NamespacedKey(AdmiralPlugin.getInstance(), id),
+                    new NamespacedKey(PaperPlugin.getInstance(), id),
                     PersistentDataType.BOOLEAN
             );
         }

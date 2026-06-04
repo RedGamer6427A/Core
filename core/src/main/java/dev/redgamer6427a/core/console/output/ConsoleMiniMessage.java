@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * - Default ansi colors and styling codes
  */
 
-public class MiniMessage {
+public class ConsoleMiniMessage {
 
     /**
      * Current colors
@@ -240,7 +240,7 @@ public class MiniMessage {
      */
     public static void initDefaultColors() {
 
-        InputStream is = MiniMessage.class.getResourceAsStream("/colors.json");
+        InputStream is = ConsoleMiniMessage.class.getResourceAsStream("/colors.json");
         if (is == null) {
             throw new IllegalStateException("Could not find colors.json");
         }

@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.paper.command.argument;
+package dev.redgamer6427a.core.minecraft.paper.command.argument;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

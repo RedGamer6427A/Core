@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static dev.redgamer6427a.core.console.output.MiniMessage.printMM;
+import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.printMM;
 
 public class TUIManager {
 

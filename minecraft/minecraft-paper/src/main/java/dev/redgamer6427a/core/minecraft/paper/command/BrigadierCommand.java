@@ -1,13 +1,13 @@
-package dev.redgamer6427a.admiral.paper.command;
+package dev.redgamer6427a.core.minecraft.paper.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.redgamer6427a.admiral.common.text.TerminalStyle;
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
-import dev.redgamer6427a.admiral.paper.command.argument.Argument;
+import dev.redgamer6427a.core.minecraft.common.text.TerminalStyle;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
+import dev.redgamer6427a.core.minecraft.paper.command.argument.Argument;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import lombok.Getter;
@@ -20,8 +20,8 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static dev.redgamer6427a.admiral.common.text.MiniMessageUtils.mm;
-import static dev.redgamer6427a.admiral.common.text.MiniMessageUtils.mmToConsole;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mmToConsole;
 
 /**
  * Represents a Brigadier-based command definition within the Admiral Paper system.
@@ -269,7 +269,7 @@ public abstract class BrigadierCommand {
         CommandSourceStack source = context.getSource();
 
 
-        if (context.getSource().getSender().hasPermission(AdmiralPlugin.getInstance().getParameters().verbosePermission())) {
+        if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getParameters().verbosePermission())) {
             if (source.getSender() instanceof ConsoleCommandSender) {
                 source.getSender().sendMessage(mm(mmToConsole(adminMessage) + TerminalStyle.RESET));
             } else {
@@ -296,7 +296,7 @@ public abstract class BrigadierCommand {
         CommandSourceStack source = context.getSource();
 
 
-        if (context.getSource().getSender().hasPermission(AdmiralPlugin.getInstance().getParameters().verbosePermission())) {
+        if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getParameters().verbosePermission())) {
             if (source.getSender() instanceof ConsoleCommandSender) {
                 source.getSender().sendMessage(mmToConsole(adminMessage + TerminalStyle.RESET));
             } else {

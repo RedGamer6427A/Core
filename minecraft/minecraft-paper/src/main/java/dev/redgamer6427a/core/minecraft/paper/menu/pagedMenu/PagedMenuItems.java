@@ -1,14 +1,14 @@
-package dev.redgamer6427a.admiral.paper.menu.pagedMenu;
+package dev.redgamer6427a.core.minecraft.paper.menu.pagedMenu;
 
 
-import dev.redgamer6427a.admiral.paper.item.ExtendedItemStack;
-import dev.redgamer6427a.admiral.paper.menu.ClickableItemStack;
+import dev.redgamer6427a.core.minecraft.paper.item.ExtendedItemStack;
+import dev.redgamer6427a.core.minecraft.paper.menu.ClickableItemStack;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.function.BiFunction;
 
-import static dev.redgamer6427a.admiral.common.text.MiniMessageUtils.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
 
 
 public class PagedMenuItems {

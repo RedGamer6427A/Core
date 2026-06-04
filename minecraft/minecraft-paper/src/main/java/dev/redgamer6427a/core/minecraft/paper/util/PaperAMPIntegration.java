@@ -1,7 +1,7 @@
-package dev.redgamer6427a.admiral.paper.util;
+package dev.redgamer6427a.core.minecraft.paper.util;
 
-import dev.redgamer6427a.admiral.common.util.AMPIntegration;
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
+import dev.redgamer6427a.core.minecraft.common.util.AMPIntegration;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import org.bukkit.Bukkit;
 
 import java.util.logging.Logger;
@@ -14,13 +14,13 @@ public class PaperAMPIntegration extends AMPIntegration {
 
     @Override
     protected void shutdown() {
-        Logger l = AdmiralPlugin.getInstance().getLogger();
+        Logger l = PaperPlugin.getInstance().getLogger();
 
         l.info("Access Management Protocol denied access.");
         l.info("Reason: "+status.status());
 
-        if(AdmiralPlugin.getInstance().getParameters().allowAMPShutDown()){
-            Bukkit.getPluginManager().disablePlugin(AdmiralPlugin.getInstance());
+        if(PaperPlugin.getInstance().getParameters().allowAMPShutDown()){
+            Bukkit.getPluginManager().disablePlugin(PaperPlugin.getInstance());
         }
 
     }

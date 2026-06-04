@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.paper.command;
+package dev.redgamer6427a.core.minecraft.paper.command;
 
 import lombok.Getter;
 

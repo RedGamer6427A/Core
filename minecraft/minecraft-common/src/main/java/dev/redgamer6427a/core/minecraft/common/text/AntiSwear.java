@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.common.text;
+package dev.redgamer6427a.core.minecraft.common.text;
 
 import net.kyori.adventure.text.Component;
 
@@ -59,7 +59,7 @@ public class AntiSwear {
     }
 
     public static boolean checkForSwear(Component input){
-        return checkForSwear(MiniMessageUtils.serialize(MiniMessageUtils.stripAllStyles(input)));
+        return checkForSwear(AdventureMiniMessage.serialize(AdventureMiniMessage.stripAllStyles(input)));
     }
 
 

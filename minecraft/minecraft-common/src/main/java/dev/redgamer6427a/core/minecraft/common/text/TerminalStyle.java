@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.common.text;
+package dev.redgamer6427a.core.minecraft.common.text;
 
 public enum TerminalStyle {
 

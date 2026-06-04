@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.paper.player;
+package dev.redgamer6427a.core.minecraft.paper.player;
 
 public abstract class PlayerModule {
 

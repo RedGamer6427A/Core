@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-import static dev.redgamer6427a.core.console.output.MiniMessage.mm;
+import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.mm;
 
 /**
  * A basic approach to logging

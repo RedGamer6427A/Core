@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.paper.menu;
+package dev.redgamer6427a.core.minecraft.paper.menu;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

@@ -1,6 +1,6 @@
-package dev.redgamer6427a.admiral.paper.item;
+package dev.redgamer6427a.core.minecraft.paper.item;
 
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,7 +23,7 @@ public class ItemUtils {
                 Boolean.TRUE.equals(
                         item.getPersistentDataContainer()
                                 .get(
-                                        new NamespacedKey(AdmiralPlugin.getInstance(), tag
+                                        new NamespacedKey(PaperPlugin.getInstance(), tag
                                 ),
                                 PersistentDataType.BOOLEAN
                         )
@@ -52,25 +52,25 @@ public class ItemUtils {
 
     public static Integer getCustomIntData(String key, ItemStack stack) {
         if (stack == null) return null;
-        NamespacedKey nKey = new NamespacedKey(AdmiralPlugin.getInstance(), key);
+        NamespacedKey nKey = new NamespacedKey(PaperPlugin.getInstance(), key);
         return stack.getPersistentDataContainer().get(nKey, PersistentDataType.INTEGER);
     }
 
     public static Double getCustomDoubleData(String key, ItemStack stack) {
         if (stack == null) return null;
-        NamespacedKey nKey = new NamespacedKey(AdmiralPlugin.getInstance(), key);
+        NamespacedKey nKey = new NamespacedKey(PaperPlugin.getInstance(), key);
         return stack.getPersistentDataContainer().get(nKey, PersistentDataType.DOUBLE);
     }
 
     public static String getCustomStringData(String key, ItemStack stack) {
         if (stack == null) return null;
-        NamespacedKey nKey = new NamespacedKey(AdmiralPlugin.getInstance(), key);
+        NamespacedKey nKey = new NamespacedKey(PaperPlugin.getInstance(), key);
         return stack.getPersistentDataContainer().get(nKey, PersistentDataType.STRING);
     }
 
     public static Boolean getCustomBooleanData(String key, ItemStack stack) {
         if (stack == null) return null;
-        NamespacedKey nKey = new NamespacedKey(AdmiralPlugin.getInstance(), key);
+        NamespacedKey nKey = new NamespacedKey(PaperPlugin.getInstance(), key);
         return stack.getPersistentDataContainer().get(nKey, PersistentDataType.BOOLEAN);
     }
 
@@ -78,12 +78,12 @@ public class ItemUtils {
         if (stack == null) return null;
         try {
             return new Location(
-                    Bukkit.getWorld(stack.getPersistentDataContainer().get(new NamespacedKey(AdmiralPlugin.getInstance(), key+".world"), PersistentDataType.STRING)),
-                    stack.getPersistentDataContainer().get(new NamespacedKey(AdmiralPlugin.getInstance(), key+".x"), PersistentDataType.DOUBLE),
-                    stack.getPersistentDataContainer().get(new NamespacedKey(AdmiralPlugin.getInstance(), key+".y"), PersistentDataType.DOUBLE),
-                    stack.getPersistentDataContainer().get(new NamespacedKey(AdmiralPlugin.getInstance(), key+".z"), PersistentDataType.DOUBLE),
-                    stack.getPersistentDataContainer().get(new NamespacedKey(AdmiralPlugin.getInstance(), key+".yaw"), PersistentDataType.FLOAT),
-                    stack.getPersistentDataContainer().get(new NamespacedKey(AdmiralPlugin.getInstance(), key+".pitch"), PersistentDataType.FLOAT)
+                    Bukkit.getWorld(stack.getPersistentDataContainer().get(new NamespacedKey(PaperPlugin.getInstance(), key+".world"), PersistentDataType.STRING)),
+                    stack.getPersistentDataContainer().get(new NamespacedKey(PaperPlugin.getInstance(), key+".x"), PersistentDataType.DOUBLE),
+                    stack.getPersistentDataContainer().get(new NamespacedKey(PaperPlugin.getInstance(), key+".y"), PersistentDataType.DOUBLE),
+                    stack.getPersistentDataContainer().get(new NamespacedKey(PaperPlugin.getInstance(), key+".z"), PersistentDataType.DOUBLE),
+                    stack.getPersistentDataContainer().get(new NamespacedKey(PaperPlugin.getInstance(), key+".yaw"), PersistentDataType.FLOAT),
+                    stack.getPersistentDataContainer().get(new NamespacedKey(PaperPlugin.getInstance(), key+".pitch"), PersistentDataType.FLOAT)
 
             );
         } catch (IllegalArgumentException e) {

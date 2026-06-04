@@ -101,7 +101,7 @@ public class LiveMap<K, V> implements Map<K, V> {
 
     @Override
     public void putAll(@NotNull Map<? extends K, ? extends V> m) {
-        for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+        for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
             notifyPut(entry.getKey(), entry.getValue());
 
         }
@@ -111,7 +111,7 @@ public class LiveMap<K, V> implements Map<K, V> {
 
     @Override
     public void clear() {
-        for (Map.Entry<? extends K, ? extends V> entry : map().entrySet()) {
+        for (Entry<? extends K, ? extends V> entry : map().entrySet()) {
             notifyRemove(entry.getKey(), entry.getValue());
         }
         map().clear();
@@ -147,7 +147,7 @@ public class LiveMap<K, V> implements Map<K, V> {
     @Override
     public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
         Objects.requireNonNull(function);
-        for (Map.Entry<K, V> entry : entrySet()) {
+        for (Entry<K, V> entry : entrySet()) {
             K k;
             V v;
             try {

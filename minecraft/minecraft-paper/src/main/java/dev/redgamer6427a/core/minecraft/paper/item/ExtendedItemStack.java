@@ -1,8 +1,8 @@
-package dev.redgamer6427a.admiral.paper.item;
+package dev.redgamer6427a.core.minecraft.paper.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.Equippable;
@@ -143,7 +143,7 @@ public class ExtendedItemStack {
 
     public ExtendedItemStack itemTag(String string){
         item.editPersistentDataContainer(persistentDataContainer -> {
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), string), PersistentDataType.BOOLEAN, true);
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), string), PersistentDataType.BOOLEAN, true);
 
         });
 
@@ -215,7 +215,7 @@ public class ExtendedItemStack {
 
     public ExtendedItemStack customDataInt(String key, int value){
         item.editPersistentDataContainer(persistentDataContainer -> {
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key), PersistentDataType.INTEGER, value);
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key), PersistentDataType.INTEGER, value);
         });
         return this;
 
@@ -223,33 +223,33 @@ public class ExtendedItemStack {
 
     public ExtendedItemStack customDataDouble(String key, double value){
         item.editPersistentDataContainer(persistentDataContainer -> {
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key), PersistentDataType.DOUBLE, value);
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key), PersistentDataType.DOUBLE, value);
         });
         return this;
     }
 
     public ExtendedItemStack customDataString(String key, String value){
         item.editPersistentDataContainer(persistentDataContainer -> {
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key), PersistentDataType.STRING, value);
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key), PersistentDataType.STRING, value);
         });
         return this;
     }
 
     public ExtendedItemStack customDataBoolean(String key, boolean value){
         item.editPersistentDataContainer(persistentDataContainer -> {
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key), PersistentDataType.BOOLEAN, value);
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key), PersistentDataType.BOOLEAN, value);
         });
         return this;
     }
 
     public ExtendedItemStack customDataLocation(String key, Location value){
         item.editPersistentDataContainer(persistentDataContainer -> {
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key+".world"), PersistentDataType.STRING, value.getWorld().getName());
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key+".x"), PersistentDataType.DOUBLE, value.x());
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key+".y"), PersistentDataType.DOUBLE, value.y());
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key+".z"), PersistentDataType.DOUBLE, value.z());
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key+".yaw"), PersistentDataType.FLOAT, value.getYaw());
-            persistentDataContainer.set(new NamespacedKey(AdmiralPlugin.getInstance(), key+".pitch"), PersistentDataType.FLOAT, value.getPitch());
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key+".world"), PersistentDataType.STRING, value.getWorld().getName());
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key+".x"), PersistentDataType.DOUBLE, value.x());
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key+".y"), PersistentDataType.DOUBLE, value.y());
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key+".z"), PersistentDataType.DOUBLE, value.z());
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key+".yaw"), PersistentDataType.FLOAT, value.getYaw());
+            persistentDataContainer.set(new NamespacedKey(PaperPlugin.getInstance(), key+".pitch"), PersistentDataType.FLOAT, value.getPitch());
         });
         return this;
     }

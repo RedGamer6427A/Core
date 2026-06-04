@@ -1,21 +1,47 @@
 package dev.redgamer6427a.core.minecraft.common.text;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MiniMessageUtils {
+public class AdventureMiniMessage {
+
+    private static final Map<String, Integer> TAGS;
+
+    static {
+        InputStream is = ConsoleMiniMessage.class.getResourceAsStream("/colors.json");
+        if (is == null) {
+            throw new IllegalStateException("Could not find colors.json");
+        }
+        try (
+                InputStreamReader reader = new InputStreamReader(is)) {
+            TAGS = new Gson().fromJson(reader,
+                    new TypeToken<Map<String, Integer>>() {
+                    }.getType());
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+    }
 
     public static String replaceColors(String text){
         if(text == null || text.isEmpty()) return text;
         String result = text;
-        for(Tags color : Tags.values()){
-            String hex = String.format("#%06X", color.getHex());
-            result = result.replaceAll("(?i)(?<!\\\\)<(" + color.getName() + ")>", "<" +hex + ">");
+        for(Map.Entry<String, Integer> entry : TAGS.entrySet()) {
+            String hex = String.format("#%06X", entry.getValue());
+            result = result.replaceAll("(?i)(?<!\\\\)<(" + entry.getKey() + ")>", "<" +hex + ">");
         }
         return result;
 
@@ -91,7 +117,7 @@ public class MiniMessageUtils {
     public static Component stripAllStyles(Component component) {
         return component.style(Style.empty())
                 .children(component.children().stream()
-                        .map(MiniMessageUtils::stripAllStyles)
+                        .map(AdventureMiniMessage::stripAllStyles)
                         .toList());
     }
 

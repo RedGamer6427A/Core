@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.common.util;
+package dev.redgamer6427a.core.minecraft.common.util;
 
 import org.jetbrains.annotations.Nullable;
 

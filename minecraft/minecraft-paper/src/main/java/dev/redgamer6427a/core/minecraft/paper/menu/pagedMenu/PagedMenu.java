@@ -1,6 +1,6 @@
-package dev.redgamer6427a.admiral.paper.menu.pagedMenu;
+package dev.redgamer6427a.core.minecraft.paper.menu.pagedMenu;
 
-import dev.redgamer6427a.admiral.paper.menu.Menu;
+import dev.redgamer6427a.core.minecraft.paper.menu.Menu;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 

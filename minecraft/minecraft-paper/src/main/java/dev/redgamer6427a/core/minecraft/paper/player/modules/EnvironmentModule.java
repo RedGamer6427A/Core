@@ -1,7 +1,7 @@
-package dev.redgamer6427a.admiral.paper.player.modules;
+package dev.redgamer6427a.core.minecraft.paper.player.modules;
 
-import dev.redgamer6427a.admiral.paper.player.ExtendedPlayer;
-import dev.redgamer6427a.admiral.paper.player.PlayerModule;
+import dev.redgamer6427a.core.minecraft.paper.player.ExtendedPlayer;
+import dev.redgamer6427a.core.minecraft.paper.player.PlayerModule;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerPlayer;

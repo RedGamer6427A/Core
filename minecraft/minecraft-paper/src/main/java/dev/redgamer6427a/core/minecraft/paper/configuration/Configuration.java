@@ -1,6 +1,6 @@
-package dev.redgamer6427a.admiral.paper.configuration;
+package dev.redgamer6427a.core.minecraft.paper.configuration;
 
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -21,7 +21,7 @@ public abstract class Configuration extends AbstractConfigurationSection {
         super("", null);
         id = fileName;
         // Ensure a "config" subdirectory exists
-        File configDir = new File(AdmiralPlugin.getInstance().getDataFolder(), "config");
+        File configDir = new File(PaperPlugin.getInstance().getDataFolder(), "config");
         if (!configDir.exists()) {
             configDir.mkdirs();
         }
@@ -38,7 +38,7 @@ public abstract class Configuration extends AbstractConfigurationSection {
 
         // Optionally save the default config
         try {
-            AdmiralPlugin.getInstance().saveDefaultConfig();
+            PaperPlugin.getInstance().saveDefaultConfig();
         } catch (IllegalArgumentException e) {
             // Ignore if it fails
         }

@@ -1,7 +1,7 @@
-package dev.redgamer6427a.admiral.paper.configuration.values;
+package dev.redgamer6427a.core.minecraft.paper.configuration.values;
 
-import dev.redgamer6427a.admiral.paper.configuration.AbstractConfigurationSection;
-import dev.redgamer6427a.admiral.paper.configuration.ConfigurationValue;
+import dev.redgamer6427a.core.minecraft.paper.configuration.AbstractConfigurationSection;
+import dev.redgamer6427a.core.minecraft.paper.configuration.ConfigurationValue;
 public class EnumCV<T extends Enum<T>> extends ConfigurationValue<T> {
 
     private final Class<T> type;

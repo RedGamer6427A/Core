@@ -6,7 +6,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
 }
 
-group = "dev.redgamer6427a.core.mc"
+group = "dev.redgamer6427a.core.minecraft.paper.testing"
 version = "2.0.0"
 
 repositories {
@@ -18,17 +18,42 @@ repositories {
 }
 
 dependencies {
+
     implementation(project(":core"))
-    implementation(project(":minecraft:common"))
-    paperweight.paperDevBundle("26.1.1.build.+")
+    implementation(project(":minecraft:minecraft-common"))
+    implementation(project(":minecraft:minecraft-paper"))
+
+    paperweight.paperDevBundle("26.1.2.build.+")
 
 }
 
 tasks.processResources {
-    val props = mapOf("version" to project.version.toString())
+
+    val props = mapOf("version" to version.toString())
     inputs.properties(props)
     filteringCharset = "UTF-8"
     filesMatching("paper-plugin.yml") {
         expand(props)
     }
 }
+
+val pluginsDir = "/home/red/Servers/Minecraft/Core Testing/Paper Test/plugins"
+
+tasks.register<Copy>("copyJar") {
+    dependsOn(tasks.shadowJar)
+
+    from(tasks.shadowJar.flatMap { it.archiveFile })
+    into(layout.projectDirectory.dir("out/jars"))
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    dependsOn ("processResources")
+    doLast {
+        copy {
+            from(archiveFile)
+            into(file(pluginsDir))
+        }
+    }
+}
+

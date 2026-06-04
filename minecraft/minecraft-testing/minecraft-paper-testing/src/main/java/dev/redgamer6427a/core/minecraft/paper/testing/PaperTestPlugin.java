@@ -1,12 +1,15 @@
 package dev.redgamer6427a.core.minecraft.paper.testing;
 
-import dev.redgamer6427a.core.minecraft.paper.AdmiralPlugin;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import dev.redgamer6427a.core.minecraft.paper.util.PaperParameters;
+import org.bukkit.permissions.Permission;
 import org.jspecify.annotations.NonNull;
 
-public class AdmiralTestPlugin extends AdmiralPlugin {
+public class PaperTestPlugin extends PaperPlugin {
     @Override
     public @NonNull PaperParameters getParameters() {
-        return null;
+        return new PaperParameters(new Permission("papertest.verbose"), null, false, false);
     }
+
+
 }

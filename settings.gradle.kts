@@ -1,0 +1,5 @@
+include("minecraft:minecraft-common")
+include("minecraft:minecraft-paper")
+include("core")
+include("minecraft:minecraft-testing")
+include("minecraft:minecraft-testing:minecraft-paper-testing")

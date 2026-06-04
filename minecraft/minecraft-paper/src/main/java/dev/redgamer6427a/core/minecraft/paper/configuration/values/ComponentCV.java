@@ -1,11 +1,11 @@
-package dev.redgamer6427a.admiral.paper.configuration.values;
+package dev.redgamer6427a.core.minecraft.paper.configuration.values;
 
-import dev.redgamer6427a.admiral.common.text.MiniMessageUtils;
-import dev.redgamer6427a.admiral.paper.configuration.AbstractConfigurationSection;
-import dev.redgamer6427a.admiral.paper.configuration.ConfigurationValue;
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage;
+import dev.redgamer6427a.core.minecraft.paper.configuration.AbstractConfigurationSection;
+import dev.redgamer6427a.core.minecraft.paper.configuration.ConfigurationValue;
 import net.kyori.adventure.text.Component;
 
-import static dev.redgamer6427a.admiral.common.text.MiniMessageUtils.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
 
 
 public class ComponentCV extends ConfigurationValue<Component> {
@@ -16,7 +16,7 @@ public class ComponentCV extends ConfigurationValue<Component> {
 
     @Override
     public void save(){
-        parent.getRootSection().config.set(subPath, MiniMessageUtils.serialize(value));
+        parent.getRootSection().config.set(subPath, AdventureMiniMessage.serialize(value));
     }
 
     @Override

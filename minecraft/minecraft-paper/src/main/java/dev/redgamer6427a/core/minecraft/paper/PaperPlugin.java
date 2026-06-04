@@ -13,11 +13,11 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import static dev.redgamer6427a.core.console.output.MiniMessage.mm;
+import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.mm;
 
-public abstract class AdmiralPlugin extends JavaPlugin {
+public abstract class PaperPlugin extends JavaPlugin {
 
-    static @Getter AdmiralPlugin instance;
+    static @Getter PaperPlugin instance;
 
     public static ComponentLogger logger(){
 
@@ -30,7 +30,7 @@ public abstract class AdmiralPlugin extends JavaPlugin {
 
     @Override
     public final void onDisable() {
-        long m = Performance.getCompletionMillis(this::disable);
+        long m = Performance.measure(this::disable);
         logger().warn(mm("Shut down. (" + m + "ms)"));
         instance = null;
     }

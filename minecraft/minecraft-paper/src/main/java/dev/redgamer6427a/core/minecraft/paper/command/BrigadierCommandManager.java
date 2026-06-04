@@ -1,7 +1,7 @@
-package dev.redgamer6427a.admiral.paper.command;
+package dev.redgamer6427a.core.minecraft.paper.command;
 
 import com.mojang.brigadier.tree.CommandNode;
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -29,7 +29,7 @@ public class BrigadierCommandManager {
 
     public static void processQueue(){
 
-        LifecycleEventManager<@NotNull Plugin> manager = AdmiralPlugin.getInstance().getLifecycleManager();
+        LifecycleEventManager<@NotNull Plugin> manager = PaperPlugin.getInstance().getLifecycleManager();
 
         manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands registrar = event.registrar();

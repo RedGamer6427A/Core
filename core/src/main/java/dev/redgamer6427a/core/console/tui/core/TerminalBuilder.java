@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static dev.redgamer6427a.core.console.output.MiniMessage.mm;
+import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.mm;
 
 /**
  * A 2D character buffer for building terminal UIs.

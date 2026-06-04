@@ -1,14 +1,14 @@
-package dev.redgamer6427a.admiral.paper.command.premade;
+package dev.redgamer6427a.core.minecraft.paper.command.premade;
 
-import dev.redgamer6427a.admiral.common.performance.Performance;
-import dev.redgamer6427a.admiral.paper.command.AllowedSources;
-import dev.redgamer6427a.admiral.paper.command.BrigadierCommand;
-import dev.redgamer6427a.admiral.paper.configuration.Configuration;
+import dev.redgamer6427a.core.performance.Performance;
+import dev.redgamer6427a.core.minecraft.paper.command.AllowedSources;
+import dev.redgamer6427a.core.minecraft.paper.command.BrigadierCommand;
+import dev.redgamer6427a.core.minecraft.paper.configuration.Configuration;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.function.Predicate;
 
-import static dev.redgamer6427a.admiral.common.text.MiniMessageUtils.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
 
 public class ReloadConfigurationsSubCommand extends BrigadierCommand {
 
@@ -19,7 +19,7 @@ public class ReloadConfigurationsSubCommand extends BrigadierCommand {
 
             answer(context, mm("<green>Reloading Configurations..."));
 
-            long millis = Performance.getCompletionMillis(() -> Configuration.getConfigurations().forEach(Configuration::load));
+            long millis = Performance.measure(() -> Configuration.getConfigurations().forEach(Configuration::load));
 
             answer(context, mm("<green>Reloaded Configurations! <gray><i>(" + millis + "ms)"));
 
@@ -41,7 +41,7 @@ public class ReloadConfigurationsSubCommand extends BrigadierCommand {
 
                 answer(context, mm("<green>Reloading " + configuration.id + ".yml..."));
 
-                long millis = Performance.getCompletionMillis(configuration::load);
+                long millis = Performance.measure(configuration::load);
 
                 answer(context, mm("<green>Reloaded " + configuration.id + ".yml! <gray><i>(" + millis + "ms)"));
 

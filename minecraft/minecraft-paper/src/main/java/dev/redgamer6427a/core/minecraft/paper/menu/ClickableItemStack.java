@@ -1,7 +1,7 @@
-package dev.redgamer6427a.admiral.paper.menu;
+package dev.redgamer6427a.core.minecraft.paper.menu;
 
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
-import dev.redgamer6427a.admiral.paper.item.ExtendedItemStack;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
+import dev.redgamer6427a.core.minecraft.paper.item.ExtendedItemStack;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static dev.redgamer6427a.admiral.common.text.MiniMessageUtils.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
 import static org.bukkit.Material.BARRIER;
 
 public class ClickableItemStack extends ItemStack {
@@ -24,7 +24,7 @@ public class ClickableItemStack extends ItemStack {
 
     private final Sound sound;
 
-    static NamespacedKey key = new NamespacedKey(AdmiralPlugin.getInstance(), "menuitem");
+    static NamespacedKey key = new NamespacedKey(PaperPlugin.getInstance(), "menuitem");
 
     public static Map<String, ClickableItemStack> registerMap = new HashMap<>();
 

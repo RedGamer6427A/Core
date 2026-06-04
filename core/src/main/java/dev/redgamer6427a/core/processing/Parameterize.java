@@ -3,7 +3,7 @@ package dev.redgamer6427a.core.processing;
 import java.util.Arrays;
 import java.util.List;
 
-import static dev.redgamer6427a.core.console.output.MiniMessage.mm;
+import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.mm;
 
 public class Parameterize {
 

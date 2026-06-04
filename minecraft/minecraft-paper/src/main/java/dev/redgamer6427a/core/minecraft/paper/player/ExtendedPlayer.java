@@ -1,6 +1,6 @@
-package dev.redgamer6427a.admiral.paper.player;
+package dev.redgamer6427a.core.minecraft.paper.player;
 
-import dev.redgamer6427a.admiral.paper.AdmiralPlugin;
+import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
@@ -23,7 +23,7 @@ public class ExtendedPlayer {
             try {
                 ownModules.add(registeredModuleClass.getDeclaredConstructor(ExtendedPlayer.class).newInstance(this));
             } catch (ReflectiveOperationException e) {
-                AdmiralPlugin.logger()
+                PaperPlugin.logger()
                         .error("Error while instantiating {} for ExtendedPlayer", registeredModuleClass.getName());
                 throw new RuntimeException(e);
             }

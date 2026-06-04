@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.paper.configuration;
+package dev.redgamer6427a.core.minecraft.paper.configuration;
 
 public abstract class ConfigurationValue<T> implements ConfigurationPart {
 

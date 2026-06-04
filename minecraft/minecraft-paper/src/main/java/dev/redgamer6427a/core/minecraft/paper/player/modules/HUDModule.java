@@ -1,8 +1,8 @@
-package dev.redgamer6427a.admiral.paper.player.modules;
+package dev.redgamer6427a.core.minecraft.paper.player.modules;
 
-import dev.redgamer6427a.admiral.paper.player.ExtendedPlayer;
-import dev.redgamer6427a.admiral.paper.player.PlayerModule;
-import dev.redgamer6427a.admiral.paper.util.Procrastinator;
+import dev.redgamer6427a.core.minecraft.paper.player.ExtendedPlayer;
+import dev.redgamer6427a.core.minecraft.paper.player.PlayerModule;
+import dev.redgamer6427a.core.minecraft.paper.util.Procrastinator;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;

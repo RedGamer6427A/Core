@@ -1,6 +1,6 @@
-package dev.redgamer6427a.admiral.paper.menu.pagedMenu;
+package dev.redgamer6427a.core.minecraft.paper.menu.pagedMenu;
 
-import dev.redgamer6427a.admiral.paper.menu.MenuMeta;
+import dev.redgamer6427a.core.minecraft.paper.menu.MenuMeta;
 import net.kyori.adventure.text.Component;
 
 import java.util.*;

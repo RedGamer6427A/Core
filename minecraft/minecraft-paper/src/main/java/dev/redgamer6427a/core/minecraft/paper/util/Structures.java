@@ -1,4 +1,4 @@
-package dev.redgamer6427a.admiral.paper.util;
+package dev.redgamer6427a.core.minecraft.paper.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
