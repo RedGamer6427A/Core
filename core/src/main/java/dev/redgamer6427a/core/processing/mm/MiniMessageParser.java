@@ -6,9 +6,7 @@ import java.util.regex.Pattern;
 
 public class MiniMessageParser {
 
-    private List<MiniMessageTagProcessor> tagProcessors = new ArrayList<>();
-
-
+    private final List<MiniMessageTagProcessor> tagProcessors = new ArrayList<>();
 
     public void addProcessor(MiniMessageTagProcessor processor) {
         tagProcessors.add(processor);

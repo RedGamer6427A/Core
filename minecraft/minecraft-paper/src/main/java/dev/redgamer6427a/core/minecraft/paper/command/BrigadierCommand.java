@@ -5,6 +5,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.common.text.TerminalStyle;
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import dev.redgamer6427a.core.minecraft.paper.command.argument.Argument;
@@ -271,13 +273,13 @@ public abstract class BrigadierCommand {
 
         if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getParameters().verbosePermission())) {
             if (source.getSender() instanceof ConsoleCommandSender) {
-                source.getSender().sendMessage(mm(mmToConsole(adminMessage) + TerminalStyle.RESET));
+                source.getSender().sendMessage(ConsoleMiniMessage.mm(AdventureMM.serialize(adminMessage) + TerminalStyle.RESET));
             } else {
                 source.getSender().sendMessage(adminMessage);
             }
         } else {
             if (source.getSender() instanceof ConsoleCommandSender) {
-                source.getSender().sendMessage(mm(mmToConsole(message) + TerminalStyle.RESET));
+                source.getSender().sendMessage(ConsoleMiniMessage.mm(AdventureMM.serialize(message) + TerminalStyle.RESET));
             } else {
                 source.getSender().sendMessage(message);
             }
@@ -298,15 +300,15 @@ public abstract class BrigadierCommand {
 
         if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getParameters().verbosePermission())) {
             if (source.getSender() instanceof ConsoleCommandSender) {
-                source.getSender().sendMessage(mmToConsole(adminMessage + TerminalStyle.RESET));
+                source.getSender().sendMessage(ConsoleMiniMessage.mm(adminMessage + TerminalStyle.RESET));
             } else {
-                source.getSender().sendMessage(adminMessage);
+                source.getSender().sendMessage(AdventureMM.mm(adminMessage));
             }
         } else {
             if (source.getSender() instanceof ConsoleCommandSender) {
-                source.getSender().sendMessage(mmToConsole(message + TerminalStyle.RESET));
+                source.getSender().sendMessage(ConsoleMiniMessage.mm(message + TerminalStyle.RESET));
             } else {
-                source.getSender().sendMessage(mm(message));
+                source.getSender().sendMessage(AdventureMM.mm(message));
             }
         }
     }

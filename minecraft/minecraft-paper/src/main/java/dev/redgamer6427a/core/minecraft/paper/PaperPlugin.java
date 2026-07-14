@@ -1,5 +1,7 @@
 package dev.redgamer6427a.core.minecraft.paper;
 
+import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.performance.Performance;
 import dev.redgamer6427a.core.minecraft.common.util.AMPIntegration;
 import dev.redgamer6427a.core.minecraft.paper.command.BrigadierCommandManager;
@@ -58,14 +60,14 @@ public abstract class PaperPlugin extends JavaPlugin {
                     AMP.shutdownOnInvalid();
                 }
             }
-
+            ConsoleMiniMessage.initDefaultColors();
+            AdventureMM.buildParser();
             beforeEnable();
 
             defineConfigurations();
 
             new EventDefiner().define(new MenuEventHandler());
             defineEvents(new EventDefiner());
-
 
             defineCommands();
             BrigadierCommandManager.processQueue();

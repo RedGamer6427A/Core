@@ -16,7 +16,9 @@ public class Parameterize {
             if (o instanceof String) {
                 oS = (String) o;
             } else {
-                oS = o.toString();
+                if (o == null) oS = "null";
+                else oS = o.toString();
+
             }
             if (mmParams) oS = mm(oS, true);
             out = out.replaceFirst("\\{}", oS);

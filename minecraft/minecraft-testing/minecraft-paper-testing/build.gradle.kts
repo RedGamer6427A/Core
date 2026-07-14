@@ -37,7 +37,11 @@ tasks.processResources {
     }
 }
 
-val pluginsDir = "/home/red/Servers/Minecraft/Core Testing/Paper Test/plugins"
+val pluginsDir1 = "/home/red/Servers/Minecraft/Core Testing/Node 1/plugins"
+val pluginsDir2 = "/home/red/Servers/Minecraft/Core Testing/Node 2/plugins"
+val pluginsDir3 = "/home/red/Servers/Minecraft/Core Testing/Node 3/plugins"
+
+
 
 tasks.register<Copy>("copyJar") {
     dependsOn(tasks.shadowJar)
@@ -52,7 +56,15 @@ tasks.shadowJar {
     doLast {
         copy {
             from(archiveFile)
-            into(file(pluginsDir))
+            into(file(pluginsDir1))
+        }
+        copy {
+            from(archiveFile)
+            into(file(pluginsDir2))
+        }
+        copy {
+            from(archiveFile)
+            into(file(pluginsDir3))
         }
     }
 }

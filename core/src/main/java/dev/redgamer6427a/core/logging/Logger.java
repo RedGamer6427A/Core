@@ -221,6 +221,31 @@ public class Logger {
     }
 
     /**
+     * Declare the catching of an exception in the logs.
+     * @param exception the caught exception
+     */
+    public void catching(String s, Exception exception) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("CATCHING! ").append(s).append("\n");
+        sb.append(exception.getClass().getName()).append(": ").append(exception.getMessage());
+        for (StackTraceElement element : exception.getStackTrace()) {
+            sb.append("\n    at ").append(element);
+        }
+
+        // causes
+        Throwable cause = exception.getCause();
+        while (cause != null) {
+            sb.append("\nCaused by: ").append(cause.getClass().getName()).append(": ").append(cause.getMessage());
+            for (StackTraceElement element : cause.getStackTrace()) {
+                sb.append("\n    at ").append(element);
+            }
+            cause = cause.getCause();
+        }
+        log(Level.ERROR, sb.toString());
+    }
+
+    /**
      * Declare the throwing of an exception
      * @param exception the thrown exception
      * @return that same exception for ease of use

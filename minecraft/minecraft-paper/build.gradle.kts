@@ -21,6 +21,4 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":minecraft:minecraft-common"))
     paperweight.paperDevBundle("26.1.2.build.+")
-
-
 }

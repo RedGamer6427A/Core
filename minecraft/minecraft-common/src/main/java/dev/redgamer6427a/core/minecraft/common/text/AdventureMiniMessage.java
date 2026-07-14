@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AdventureMiniMessage {
-
+    @Deprecated
     private static final Map<String, Integer> TAGS;
 
     static {
@@ -35,7 +35,7 @@ public class AdventureMiniMessage {
         }
 
     }
-
+    @Deprecated
     public static String replaceColors(String text){
         if(text == null || text.isEmpty()) return text;
         String result = text;
@@ -46,7 +46,7 @@ public class AdventureMiniMessage {
         return result;
 
     }
-
+    @Deprecated
     public static Component mm(String input) {
         if(input == null){
             return Component.empty();
@@ -54,7 +54,7 @@ public class AdventureMiniMessage {
         return MiniMessage.miniMessage().deserialize(replaceColors(input));
 
     }
-
+    @Deprecated
     public static String mmToConsole(String input) {
         String result = replaceColors(input); // first expand <RED> etc. to <#FF6600>
 
@@ -109,18 +109,18 @@ public class AdventureMiniMessage {
         return sb.toString();
     }
 
-
+    @Deprecated
     public static String mmToConsole(Component input) {
         return mmToConsole(MiniMessage.miniMessage().serialize(mm(MiniMessage.miniMessage().serialize(input))));
     }
-
+    @Deprecated
     public static Component stripAllStyles(Component component) {
         return component.style(Style.empty())
                 .children(component.children().stream()
                         .map(AdventureMiniMessage::stripAllStyles)
                         .toList());
     }
-
+    @Deprecated
     public static String serialize(Component component){
         String s = MiniMessage.miniMessage().serialize(component);
 
