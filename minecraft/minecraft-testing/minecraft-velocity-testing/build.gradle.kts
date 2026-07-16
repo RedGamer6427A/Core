@@ -26,16 +26,6 @@ dependencies {
     annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
 }
 
-tasks.processResources {
-
-    val props = mapOf("version" to version.toString())
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("paper-plugin.yml") {
-        expand(props)
-    }
-}
-
 val pluginsDir = "/home/red/Servers/Minecraft/Core Testing/Proxy/plugins"
 
 tasks.register<Copy>("copyJar") {

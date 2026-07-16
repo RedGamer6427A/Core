@@ -84,6 +84,20 @@ public class DBUtil {
         return gson.toJson(object).replace("'", "''");
     }
 
+    public static Object bindValue(Object value) {
+        if (value == null) return null;
+        if (value instanceof String s) return s;
+        if (value instanceof UUID uuid) return uuid.toString();
+        if (value instanceof Boolean b) return b; // let driver handle, or b ? 1 : 0 if needed
+        if (value instanceof Number) return value;
+        if (value instanceof java.time.Instant instant) return instant.toEpochMilli();
+        if (value instanceof Date date) return date.getTime();
+        if (value instanceof java.time.LocalDate || value instanceof java.time.LocalDateTime)
+            return value.toString().replace("T", " ");
+        if (value instanceof java.math.BigDecimal bd) return bd.toString();
+        return gson.toJson(value); // collections/complex objects → plain JSON, no SQL quoting
+    }
+
     /**
      * Parse the MariaDB Object into a Java Object
      *

@@ -40,7 +40,7 @@ public class PaperTestPlugin extends PaperPlugin {
     public void afterEnable() {
         String clientID = Config.getInstance().getChatCategory().clientID.value();
         if (!Objects.equals(clientID, "none")) {
-            client = new MessageBusClient("127.0.0.0", 12443, "just_a_pass", clientID);
+            client = new MessageBusClient("127.0.0.0", 25581, "ascii-password", clientID);
             client.onMessage(message -> {
                 logger().info(message.toString());
                 MessagingHandler.handle(message);

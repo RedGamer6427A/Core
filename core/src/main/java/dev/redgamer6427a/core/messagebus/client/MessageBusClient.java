@@ -6,6 +6,7 @@ import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.Message;
 import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponses;
 import dev.redgamer6427a.core.messagebus.MessageBusUtil;
+import lombok.Getter;
 
 import javax.net.ssl.*;
 import java.io.DataInputStream;
@@ -32,6 +33,8 @@ public class MessageBusClient {
     private final String pass;
     private String clientID;
 
+
+    @Getter
     private volatile boolean shouldBeSubscribed = false;
 
     private SSLSocket socket;
@@ -69,6 +72,7 @@ public class MessageBusClient {
     }
 
     public void connect() throws IOException, GeneralSecurityException {
+        logger.info("Connecting to broker...");
         SSLContext ctx = SSLContext.getInstance("TLS");
         TrustManager trustAll = new X509TrustManager() {
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
@@ -138,7 +142,7 @@ public class MessageBusClient {
             boolean urgent = (flags & FLAG_URGENT) != 0;
             messageHandler.accept(new Message(destination, sender, contents, urgent));
         } catch (Exception e) {
-            logger.warning("Failed to parse pushed message", e);
+            logger.catching("Failed to handle received message", e);
         }
     }
 
@@ -177,6 +181,7 @@ public class MessageBusClient {
 
     public void close() {
         shouldBeSubscribed = false; // fixed: was `true`, backwards
+        logger.info("Closing client...");
         try {
             if (socket != null) socket.close();
         } catch (IOException ignored) {
@@ -209,53 +214,70 @@ public class MessageBusClient {
         return sendMessage(message, 0);
     }
 
+    /**
+     * WARNING! THIS METHOD IS BLOCKING!
+     *
+     * @return
+     */
     public int subscribe() {
-        if (shouldBeSubscribed) return MessageBusBrokerResponses.ALL_GOOD.getCode();
-        if (!isConnected()) {
+        synchronized (sendLock) {
+            logger.info("Subscribing to broker as {}...", clientID);
+            logger.finest("Subscribe method called");
+
+            if (shouldBeSubscribed) return MessageBusBrokerResponses.ALL_GOOD.getCode();
+            if (!isConnected()) {
+                try {
+                    connect();
+                    shouldBeSubscribed = false;
+                } catch (Exception e) {
+                    logger.catching(e);
+                    return -1;
+                }
+            }
+            logger.finest("All checks passed..");
             try {
-                connect();
-                shouldBeSubscribed = false;
+                ByteBuffer buffer = ByteBuffer.allocate(1 + ID_LENGTH + PASS_LENGTH);
+                buffer.put(TYPE_SUBSCRIBE);
+                buffer.put(MessageBusUtil.toFixedField(clientID, ID_LENGTH));
+                buffer.put(MessageBusUtil.toFixedField(pass, PASS_LENGTH));
+                logger.finest("Sending Frame..");
+                sendFrame(buffer.array());
+                logger.finest("Frame sent, awaiting response...");
+                byte[] res = awaitResponse();
+                int resCode = Byte.toUnsignedInt(res[0]);
+                logger.finest("Response code: " + resCode);
+                if (resCode != MessageBusBrokerResponses.ALL_GOOD.getCode()) {
+                    if (resCode == MessageBusBrokerResponses.BAD_PASSWORD.getCode()) {
+                        logger.critical("Client owns an invalid password. Please check the configuration");
+
+                        close();
+                        return resCode;
+                    } else if (resCode == MessageBusBrokerResponses.ALREADY_AUTHORIZED.getCode()) {
+                        logger.warning("Broker says the client is already authorized. Moving on...");
+                        shouldBeSubscribed = true;
+                        return MessageBusBrokerResponses.ALL_GOOD.getCode();
+                    } else if (resCode == MessageBusBrokerResponses.CLIENT_ID_ALREADY_IN_USE.getCode()) {
+                        logger.critical("Broker says the client's id is already being used. Please restart the broker!");
+                        close();
+                        return resCode;
+                    } else {
+                        logger.warning("Got error code " + MessageBusBrokerResponses.fromCode(resCode) + " which makes next to no sense in auth.");
+                        return resCode;
+                    }
+                } else {
+                    logger.info("Successfully subscribed to broker!");
+                    shouldBeSubscribed = true;
+                    return resCode;
+                }
+
+            } catch (SocketTimeoutException e) {
+                logger.warning("Broker did not respond in time, closing connection.");
+                close();
+                return -1;
             } catch (Exception e) {
                 logger.catching(e);
                 return -1;
             }
-        }
-
-        try {
-            ByteBuffer buffer = ByteBuffer.allocate(1 + ID_LENGTH + PASS_LENGTH);
-            buffer.put(TYPE_SUBSCRIBE);
-            buffer.put(MessageBusUtil.toFixedField(clientID, ID_LENGTH));
-            buffer.put(MessageBusUtil.toFixedField(pass, PASS_LENGTH));
-
-            sendFrame(buffer.array());
-            byte[] res = awaitResponse();
-            int resCode = Byte.toUnsignedInt(res[0]);
-
-            if (resCode != MessageBusBrokerResponses.ALL_GOOD.getCode()) {
-                if (resCode == MessageBusBrokerResponses.BAD_PASSWORD.getCode()) {
-                    logger.critical("Client owns an invalid password. Please check the configuration");
-                    close();
-                    return resCode;
-                } else if (resCode == MessageBusBrokerResponses.ALREADY_AUTHORIZED.getCode()) {
-                    logger.warning("Broker says the client is already authorized. Moving on...");
-                    shouldBeSubscribed = true;
-                    return MessageBusBrokerResponses.ALL_GOOD.getCode();
-                } else {
-                    logger.warning("Got error code " + MessageBusBrokerResponses.fromCode(resCode) + " which makes next to no sense in auth.");
-                    return resCode;
-                }
-            } else {
-                shouldBeSubscribed = true;
-                return resCode;
-            }
-
-        } catch (SocketTimeoutException e) {
-            logger.warning("Broker did not respond in time, closing connection.");
-            close();
-            return -1;
-        } catch (Exception e) {
-            logger.catching(e);
-            return -1;
         }
     }
 
@@ -267,7 +289,7 @@ public class MessageBusClient {
      * @return
      */
     public int sendMessage(Message message, int retryNum) {
-        if (retryNum > 3) {
+        if (retryNum > 0) {
             logger.error("Was unable to properly communicate with the broker after 3 times!");
             return -1;
         }
@@ -333,4 +355,6 @@ public class MessageBusClient {
             }
         }
     }
+
+
 }

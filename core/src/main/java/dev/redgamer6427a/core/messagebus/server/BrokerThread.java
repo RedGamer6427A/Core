@@ -14,11 +14,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -26,10 +22,12 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BrokerThread implements Runnable {
@@ -45,7 +43,8 @@ public class BrokerThread implements Runnable {
     @Getter
     private List<BrokerProcessor> brokerProcessors = new ArrayList<>();
 
-
+    @Getter
+    private List<String> brokerDestinations = new ArrayList<>();
 
 
     @Getter
@@ -110,7 +109,7 @@ public class BrokerThread implements Runnable {
 
     public void unregisterClient(ClientConnection connection) {
         if (connection.getClientId() != null) {
-            connections.remove(connection.getClientId());
+            connections.remove(connection.getClientId(), connection);
         }
     }
 
@@ -248,7 +247,9 @@ public class BrokerThread implements Runnable {
                 .map(Map.Entry::getValue)
                 .toList();
 
-        if (targets.isEmpty()) {
+
+        ;
+        if (targets.isEmpty() && brokerDestinations.stream().filter(s -> matchesPattern(msg.destination(), s)).findFirst().isEmpty()) {
             logger.warning("No subscriber for destination: " + msg.destination());
             return;
         }
@@ -261,7 +262,7 @@ public class BrokerThread implements Runnable {
         }
     }
 
-    private boolean matchesPattern(String pattern, String destination) {
+    public static boolean matchesPattern(String pattern, String destination) {
         if (Objects.equals(pattern, "*")) return true;
         if (!pattern.contains("*")) return pattern.equals(destination);
         String regex = Arrays.stream(pattern.split("\\*", -1))

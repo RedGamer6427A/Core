@@ -16,9 +16,7 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static dev.redgamer6427a.core.messagebus.MessageBusConstants.*;
@@ -151,6 +149,8 @@ public class ClientConnection implements Runnable {
 
                     authorized = true;
                     socket.setSoTimeout(0);
+                    logger.info("Client {} successfully registered (port: {})!", clientId, socket.getPort());
+
                 } else {
                     this.clientId = clientId;
                     try {
@@ -203,6 +203,7 @@ public class ClientConnection implements Runnable {
     }
 
     private void ackFrame() throws IOException {
+        logger.finest("Acknowledging frame");
         ByteBuffer buf = ByteBuffer.allocate(1);
         buf.put((byte) MessageBusBrokerResponses.ALL_GOOD.getCode());
         sendResponse(buf.array());
@@ -212,7 +213,7 @@ public class ClientConnection implements Runnable {
         ByteBuffer buf = ByteBuffer.allocate(1);
         buf.put((byte) code);
 
-        logger.warning("Client connection error: {} (ip: {}, authorized: {}, id: '{}')", MessageBusBrokerResponses.fromCode(code), socket.getInetAddress().getHostAddress(), authorized, clientId);
+        logger.warning("Client connection error: {} (ip: {}, authorized: {}, id: '{}', port: {})", MessageBusBrokerResponses.fromCode(code), socket.getInetAddress().getHostAddress(), authorized, clientId, socket.getPort());
 
         sendResponse(buf.array());
 

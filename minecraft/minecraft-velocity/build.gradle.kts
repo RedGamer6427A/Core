@@ -20,5 +20,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":minecraft:minecraft-common"))
     compileOnly("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
+    implementation("dev.dejvokep:boosted-yaml:1.3.6")
     annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
 }

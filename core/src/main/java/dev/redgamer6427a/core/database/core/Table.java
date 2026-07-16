@@ -150,9 +150,11 @@ public abstract class Table<K, R extends Record> {
             for (RecordComponent rc : rec.getClass().getRecordComponents()) {
                 i++;
                 try {
-                    Object value = rc.getAccessor().invoke(rec); // get the actual field value
-
-                    stmt.setObject(i, DBUtil.compileValue(value)); // bind it to the statement
+                    Object value = rc.getAccessor().invoke(rec);
+                    Object bindValue = (value == null || value instanceof Number || value instanceof Boolean)
+                            ? value
+                            : (value instanceof String s) ? s : DBUtil.bindValue(value); // see below
+                    stmt.setObject(i, bindValue);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     i--;
                 }
