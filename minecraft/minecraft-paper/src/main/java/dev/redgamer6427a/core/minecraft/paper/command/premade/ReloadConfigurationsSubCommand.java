@@ -8,12 +8,13 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.function.Predicate;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+
 
 public class ReloadConfigurationsSubCommand extends BrigadierCommand {
 
     public ReloadConfigurationsSubCommand(String name, AllowedSources allowedSources, Predicate<CommandSourceStack> requirement) {
-        super(name, "Reload Configurations");
+        super(name);
 
         setDefaultExecutor(context -> {
 

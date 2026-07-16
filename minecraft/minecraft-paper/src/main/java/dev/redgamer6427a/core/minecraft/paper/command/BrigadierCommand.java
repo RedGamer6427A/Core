@@ -18,12 +18,14 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mmToConsole;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mmToConsole;
+
 
 /**
  * Represents a Brigadier-based command definition within the Admiral Paper system.
@@ -81,6 +83,17 @@ public abstract class BrigadierCommand {
         this.literal = literal;
         this.description = description;
         this.aliases = Arrays.stream(aliases).toList();
+    }
+
+    /**
+     * Constructs a new BrigadierCommand instance.
+     *
+     * @param literal     the name of the command
+     */
+    public BrigadierCommand(String literal) {
+        this.literal = literal;
+        this.description = "";
+        this.aliases = List.of();
     }
 
     /**
@@ -252,7 +265,7 @@ public abstract class BrigadierCommand {
     public static void answer(CommandContext<CommandSourceStack> context, String message) {
         CommandSender sender = context.getSource().getSender();
         if (sender instanceof ConsoleCommandSender) {
-            sender.sendMessage(mmToConsole(message) + TerminalStyle.RESET);
+            sender.sendMessage(ConsoleMiniMessage.mm(message) + TerminalStyle.RESET);
         } else {
             sender.sendMessage(mm(message));
         }
@@ -302,13 +315,13 @@ public abstract class BrigadierCommand {
             if (source.getSender() instanceof ConsoleCommandSender) {
                 source.getSender().sendMessage(ConsoleMiniMessage.mm(adminMessage + TerminalStyle.RESET));
             } else {
-                source.getSender().sendMessage(AdventureMM.mm(adminMessage));
+                source.getSender().sendMessage(mm(adminMessage));
             }
         } else {
             if (source.getSender() instanceof ConsoleCommandSender) {
                 source.getSender().sendMessage(ConsoleMiniMessage.mm(message + TerminalStyle.RESET));
             } else {
-                source.getSender().sendMessage(AdventureMM.mm(message));
+                source.getSender().sendMessage(mm(message));
             }
         }
     }
@@ -364,6 +377,14 @@ public abstract class BrigadierCommand {
 
         return merged;
 
+    }
+
+    public static Predicate<CommandSourceStack> permissionPredicate(String permission) {
+        return commandSourceStack -> commandSourceStack.getSender().hasPermission(permission);
+    }
+
+    public static Predicate<CommandSourceStack> permissionPredicate(Permission permission) {
+        return commandSourceStack -> commandSourceStack.getSender().hasPermission(permission);
     }
 
 }

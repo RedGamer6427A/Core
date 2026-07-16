@@ -13,6 +13,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,8 @@ public class MessageBusClient {
     private final String pass;
     private String clientID;
 
+    @Getter
+    private long lastHeartbeat = 0;
 
     @Getter
     private volatile boolean shouldBeSubscribed = false;
@@ -51,6 +55,7 @@ public class MessageBusClient {
 
     private static final Logger logger = Logger.create();
     private final Gson gson = new Gson();
+    private Thread heartbeatThread;
 
     public MessageBusClient(String host, int port, String pass, String clientID) {
         this.clientID = clientID;
@@ -98,6 +103,47 @@ public class MessageBusClient {
         readerThread = new Thread(this::readLoop, "hub-client-reader-" + clientID);
         readerThread.setDaemon(true);
         readerThread.start();
+
+        heartbeatThread = new Thread(this::heartbeatLoop, "hub-client-heartbeat-" + clientID);
+        heartbeatThread.setDaemon(true);
+        heartbeatThread.start();
+    }
+
+    private void heartbeatLoop() {
+        try {
+            while (isConnected()) {
+                Thread.sleep(1000);
+                if (System.currentTimeMillis() - lastHeartbeat > 30*1000 && shouldBeSubscribed) {
+                    sendHeartbeat();
+                }
+            }
+        } catch (InterruptedException ignored) {
+
+        }
+    }
+
+    private void sendHeartbeat() {
+        logger.finest("Sending heartbeat...");
+
+        synchronized (sendLock) {
+            ByteBuffer buffer = ByteBuffer.allocate(1);
+            buffer.put(TYPE_HEARTBEAT);
+
+            try {
+                sendFrame(buffer.array());
+                byte res = awaitResponse()[0];
+                if ((int) res != MessageBusBrokerResponses.ALL_GOOD.getCode()){
+                    logger.warning("Heartbeat response is not ok {}", MessageBusBrokerResponses.fromCode(res));
+                } else {
+                    logger.fine("Heartbeat ok!");
+                    lastHeartbeat = System.currentTimeMillis();
+                }
+            } catch (IOException e) {
+                logger.catching("Encountered an uncaught IOException while sending a heartbeat.", e);
+
+            }
+
+        }
     }
 
     private void readLoop() {
@@ -106,16 +152,21 @@ public class MessageBusClient {
                 byte[] frame = readFrame();
                 if (frame == null) continue;
                 if (frame.length == 1) {
+                    logger.finest("Received a response frame from the broker: {}", (Object) frame);
                     pendingResponse.offer(frame);
                 } else if (frame.length > 0) {
+                    logger.finest("Received a message frame from the broker: {}", (Object) frame);
                     handlePushedMessage(frame);
                 }
             }
         } catch (EOFException e) {
-            logger.info("Connection closed by broker for " + clientID);
+            logger.warning("Connection closed by broker. Reconnecting...");
+            reconnect();
+
         } catch (IOException e) {
             logger.catching(e);
-            logger.error("Read loop ended for " + clientID);
+            logger.error("Read loop ended. Reconnecting...");
+            reconnect();
         }
     }
 
@@ -140,19 +191,59 @@ public class MessageBusClient {
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getAsString()));
 
             boolean urgent = (flags & FLAG_URGENT) != 0;
-            messageHandler.accept(new Message(destination, sender, contents, urgent));
+            Message message = new Message(sender, destination, contents, urgent);
+            logger.finest("Parsed message from the broker: {}", message);
+            messageHandler.accept(message);
         } catch (Exception e) {
             logger.catching("Failed to handle received message", e);
         }
     }
 
     public void sendFrame(byte[] payload) throws IOException {
-        synchronized (out) {
-            out.writeInt(payload.length);
-            out.write(payload);
-            out.flush();
+        try {
+            synchronized (out) {
+                out.writeInt(payload.length);
+                out.write(payload);
+                out.flush();
+            }
+        } catch (SocketException e) {
+            logger.warning("Client could not connect to broker. Reconnecting...");
+            reconnect();
         }
     }
+
+    private final AtomicReference<Thread> reconnectThread = new AtomicReference<>();
+
+    private synchronized void reconnect() {
+        if (reconnectThread.get() != null) return;
+
+        close(true);
+
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+
+                while (!Thread.currentThread().isInterrupted()) {
+                    int res = subscribe();
+
+                    if (res == MessageBusBrokerResponses.ALL_GOOD.getCode()) {
+                        logger.info("Reconnected to broker!");
+                        break;
+                    }
+
+                    Thread.sleep(10_000);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                reconnectThread.set(null);
+            }
+        }, "messagebus-reconnect-" + clientID);
+
+        reconnectThread.set(thread);
+        thread.start();
+    }
+
 
     public byte[] readFrame() throws IOException {
         int length = in.readInt();
@@ -179,11 +270,15 @@ public class MessageBusClient {
         return socket != null && !socket.isClosed();
     }
 
-    public void close() {
+    public void close(boolean isReconnect) {
         shouldBeSubscribed = false; // fixed: was `true`, backwards
-        logger.info("Closing client...");
+        if (!isReconnect) logger.info("Closing client...");
+
         try {
             if (socket != null) socket.close();
+            readerThread.interrupt();
+            heartbeatThread.interrupt();
+            if (reconnectThread.get() != null) reconnectThread.get().interrupt();
         } catch (IOException ignored) {
         }
     }
@@ -227,7 +322,13 @@ public class MessageBusClient {
             if (shouldBeSubscribed) return MessageBusBrokerResponses.ALL_GOOD.getCode();
             if (!isConnected()) {
                 try {
-                    connect();
+                    try {
+                        connect();
+                    } catch (SocketException e) {
+                        logger.warning("An error occurred while trying to subscribe! Reconnecting...");
+                        reconnect();
+                        return -1;
+                    }
                     shouldBeSubscribed = false;
                 } catch (Exception e) {
                     logger.catching(e);
@@ -250,15 +351,15 @@ public class MessageBusClient {
                     if (resCode == MessageBusBrokerResponses.BAD_PASSWORD.getCode()) {
                         logger.critical("Client owns an invalid password. Please check the configuration");
 
-                        close();
+                        close(false);
                         return resCode;
                     } else if (resCode == MessageBusBrokerResponses.ALREADY_AUTHORIZED.getCode()) {
                         logger.warning("Broker says the client is already authorized. Moving on...");
                         shouldBeSubscribed = true;
                         return MessageBusBrokerResponses.ALL_GOOD.getCode();
                     } else if (resCode == MessageBusBrokerResponses.CLIENT_ID_ALREADY_IN_USE.getCode()) {
-                        logger.critical("Broker says the client's id is already being used. Please restart the broker!");
-                        close();
+                        logger.critical("Broker says the client's id is already being used (Please check the config). Reconnecting...");
+                        reconnect();
                         return resCode;
                     } else {
                         logger.warning("Got error code " + MessageBusBrokerResponses.fromCode(resCode) + " which makes next to no sense in auth.");
@@ -271,8 +372,8 @@ public class MessageBusClient {
                 }
 
             } catch (SocketTimeoutException e) {
-                logger.warning("Broker did not respond in time, closing connection.");
-                close();
+                logger.warning("Broker did not respond in time, reconnecting...");
+                reconnect();
                 return -1;
             } catch (Exception e) {
                 logger.catching(e);
@@ -346,8 +447,12 @@ public class MessageBusClient {
                 }
                 return resCode;
             } catch (SocketTimeoutException e) {
-                logger.warning("Broker did not respond in time, closing connection.");
-                close();
+                logger.warning("Broker did not respond in time, reconnecting...");
+                reconnect();
+                return -1;
+            } catch (SocketException e) {
+                logger.warning("An error occurred while trying to send the message! Reconnecting...");
+                reconnect();
                 return -1;
             } catch (Exception e) {
                 logger.catching(e);

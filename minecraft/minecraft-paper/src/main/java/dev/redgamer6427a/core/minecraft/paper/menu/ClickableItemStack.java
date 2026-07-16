@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
+
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
 import static org.bukkit.Material.BARRIER;
 
 public class ClickableItemStack extends ItemStack {

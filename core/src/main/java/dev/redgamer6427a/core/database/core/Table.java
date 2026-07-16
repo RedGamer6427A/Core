@@ -39,6 +39,10 @@ public abstract class Table<K, R extends Record> {
      * @param recordClass The class of the Record.
      */
     protected Table(String tableName, Database database, Class<K> keyClass, Class<R> recordClass, DBUtil.Dialect dialect) {
+        if (tableName.isEmpty()) {
+            throw new IllegalArgumentException("Table name cannot be empty");
+        }
+
         this.tableName = tableName;
         this.database = database;
         this.errorHandler = database.getErrorHandler();

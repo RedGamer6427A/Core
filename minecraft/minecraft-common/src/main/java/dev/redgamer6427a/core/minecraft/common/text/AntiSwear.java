@@ -59,7 +59,7 @@ public class AntiSwear {
     }
 
     public static boolean checkForSwear(Component input){
-        return checkForSwear(AdventureMiniMessage.serialize(AdventureMiniMessage.stripAllStyles(input)));
+        return checkForSwear(AdventureMM.serialize(AdventureMM.stripAllStyles(input)));
     }
 
 

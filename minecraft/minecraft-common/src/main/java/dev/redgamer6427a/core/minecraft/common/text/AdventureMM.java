@@ -5,10 +5,10 @@ import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.processing.mm.MiniMessageParser;
 import dev.redgamer6427a.core.processing.mm.MiniMessageTagProcessor;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ObjectComponent;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -53,6 +53,18 @@ public class AdventureMM {
         StringBuilder out = new StringBuilder();
         serializeNode(component, out);
         return out.toString();
+    }
+
+    public static String mmToConsole(Component component) {
+        String mm = serialize(component);
+        return ConsoleMiniMessage.mm(mm);
+    }
+
+    public static Component stripAllStyles(Component component) {
+        return component.style(Style.empty())
+                .children(component.children().stream()
+                        .map(AdventureMM::stripAllStyles)
+                        .toList());
     }
 
     private static TagResolver headTextureHashTag() {

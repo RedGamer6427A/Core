@@ -10,7 +10,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
 
 
 public abstract class Menu implements InventoryHolder {

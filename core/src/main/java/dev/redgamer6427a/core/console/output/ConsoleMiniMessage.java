@@ -240,19 +240,20 @@ public class ConsoleMiniMessage {
      */
     public static void initDefaultColors() {
 
-        InputStream is = ConsoleMiniMessage.class.getResourceAsStream("/colors.json");
-        if (is == null) {
-            throw new IllegalStateException("Could not find colors.json");
-        }
-        try (
-                InputStreamReader reader = new InputStreamReader(is)) {
-            Map<String, Integer> colorMap = new Gson().fromJson(reader,
-                    new TypeToken<Map<String, Integer>>() {
-                    }.getType());
-            useColors(colorMap);
 
+        try (InputStream is = ConsoleMiniMessage.class.getResourceAsStream("/colors.json")) {
+            if (is == null) {
+                throw new IllegalStateException("Could not find colors.json");
+            }
+
+            Map<String, Integer> colorMap = new Gson().fromJson(
+                    new InputStreamReader(is),
+                    new TypeToken<Map<String, Integer>>() {}.getType()
+            );
+
+            useColors(colorMap);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException("Failed loading colors.json", e);
         }
 
 

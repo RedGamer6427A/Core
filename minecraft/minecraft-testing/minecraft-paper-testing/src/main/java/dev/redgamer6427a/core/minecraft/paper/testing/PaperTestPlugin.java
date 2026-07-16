@@ -1,5 +1,6 @@
 package dev.redgamer6427a.core.minecraft.paper.testing;
 
+import dev.redgamer6427a.core.logging.Level;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.client.MessageBusClient;
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
@@ -29,7 +30,7 @@ public class PaperTestPlugin extends PaperPlugin {
 
     @Override
     public void beforeEnable() {
-
+        Logger.setMinLevel(Level.FINEST);
         Logger.setOut(s -> logger().info(s));
         Logger.setErrOut(s -> logger().error(s));
 
@@ -63,7 +64,7 @@ public class PaperTestPlugin extends PaperPlugin {
     @Override
     public void disable() {
         try {
-            client.close();
+            client.close(true);
         } catch (Exception ignored) {
         }
     }

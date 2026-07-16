@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.util.function.BiFunction;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMiniMessage.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
 
 
 public class PagedMenuItems {

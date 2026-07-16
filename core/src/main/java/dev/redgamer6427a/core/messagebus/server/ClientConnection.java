@@ -10,6 +10,7 @@ import lombok.Getter;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -76,6 +77,8 @@ public class ClientConnection implements Runnable {
 
         } catch (SocketTimeoutException e) {
             logger.warning("Client {} timed out before authenticating", socket.getInetAddress().getHostAddress());
+        } catch (EOFException e) {
+            logger.info("Connection closed (EOF) : {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
         } catch (IOException e) {
             logger.catching("Client connection closed", e);
         } catch (RuntimeException e) {
@@ -86,7 +89,6 @@ public class ClientConnection implements Runnable {
     }
 
 
-
     private byte[] readFrame(DataInputStream in) throws IOException {
         int length = in.readInt();           // blocks til 4 bytes available
         if (length < 0) {
@@ -95,13 +97,15 @@ public class ClientConnection implements Runnable {
         if (length > MAX_FRAME_SIZE) {
             error(MessageBusBrokerResponses.FRAME_TOO_LARGE.getCode()); // new code: frame too large
             out.flush();
-            // still need to drain the oversized payload off the stream, or next read desyncs
+            // still need to drain the oversized payloaEOFExceptiond off the stream, or next read desyncs
             in.skipNBytes(length);
             return null; // signal caller to skip processing this frame
         }
 
         byte[] payload = new byte[length];
-        in.readFully(payload);               // blocks til exactly `length` bytes read
+
+        in.readFully(payload);  // blocks til exactly `length` bytes read
+
         return payload;
     }
 
@@ -146,7 +150,7 @@ public class ClientConnection implements Runnable {
                     }
 
                     authorized = true;
-                    socket.setSoTimeout(0);
+                    socket.setSoTimeout(180_000);
                     logger.info("Client {} successfully registered (port: {})!", clientId, socket.getPort());
 
                 } else {
@@ -184,7 +188,7 @@ public class ClientConnection implements Runnable {
                     error(MessageBusBrokerResponses.MALFORMED_JSON.getCode());
                     return;
                 }
-                boolean isUrgent = (flags & FLAG_URGENT)   != 0; // Coming through!!!!
+                boolean isUrgent = (flags & FLAG_URGENT) != 0; // Coming through!!!!
                 Message message = new Message(destination, clientId, contents, isUrgent);
                 if (isUrgent) {
                     brokerThread.getMessages().addFirst(message);
@@ -192,6 +196,14 @@ public class ClientConnection implements Runnable {
                     brokerThread.getMessages().add(message);
                 }
 
+            }
+            case TYPE_HEARTBEAT -> {
+                if (!authorized) {
+                    error(MessageBusBrokerResponses.NOT_AUTHORIZED.getCode());
+                    out.flush();
+                    socket.close();
+                    return;
+                }
             }
         }
 
