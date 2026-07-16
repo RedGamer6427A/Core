@@ -50,6 +50,7 @@ public abstract class Table<K, R extends Record> {
     protected abstract String buildUpsertSuffix(List<TableColumn> columns);
 
     private static final Gson gson = new Gson();
+
     /**
      * Parse the MariaDB Object into a Java Object
      *
@@ -87,6 +88,7 @@ public abstract class Table<K, R extends Record> {
      * Ensures the table exists.
      */
     private boolean ensured = false;
+
     public void ensureExists() {
         if (ensured) return;
         List<TableColumn> columns = getTableColumns();
@@ -151,9 +153,7 @@ public abstract class Table<K, R extends Record> {
                 i++;
                 try {
                     Object value = rc.getAccessor().invoke(rec);
-                    Object bindValue = (value == null || value instanceof Number || value instanceof Boolean)
-                            ? value
-                            : (value instanceof String s) ? s : DBUtil.bindValue(value); // see below
+                    Object bindValue = (value == null || value instanceof Number || value instanceof Boolean) ? value : (value instanceof String s) ? s : DBUtil.bindValue(value); // see below
                     stmt.setObject(i, bindValue);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     i--;
@@ -184,18 +184,7 @@ public abstract class Table<K, R extends Record> {
 
             if (!rs.next()) return null;
 
-            List<Object> values = new ArrayList<>();
-            List<TableColumn> columns = getTableColumns();
-
-            for (TableColumn col : columns) {
-                String strVal = rs.getString(col.name());
-                values.add(DBUtil.getValue(strVal, col));
-            }
-
-            Class<?>[] paramTypes = columns.stream().map(TableColumn::type).toArray(Class<?>[]::new);
-
-            Constructor<R> rConstructor = recordClass.getConstructor(paramTypes);
-            return rConstructor.newInstance(values.toArray());
+            return makeInstance(rs);
 
         } catch (SQLException e) {
             errorHandler.accept(e);
@@ -232,21 +221,10 @@ public abstract class Table<K, R extends Record> {
         logStatement(sql);
         try (PreparedStatement stmt = database.getConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
-            List<TableColumn> columns = getTableColumns();
-
             while (rs.next()) {
                 K key = getKeyValue(rs.getString("id"));
-                List<Object> values = new ArrayList<>();
 
-                for (TableColumn col : columns) {
-                    String strVal = rs.getString(col.name());
-                    values.add(DBUtil.getValue(strVal, col));
-                }
-
-                Class<?>[] paramTypes = columns.stream().map(TableColumn::type).toArray(Class<?>[]::new);
-
-                Constructor<R> rConstructor = recordClass.getConstructor(paramTypes);
-                R record = rConstructor.newInstance(values.toArray());
+                R record = makeInstance(rs);
                 map.put(key, record);
             }
 
@@ -258,6 +236,20 @@ public abstract class Table<K, R extends Record> {
         }
 
         return map;
+    }
+
+    private R makeInstance(ResultSet rs) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        List<Object> values = new ArrayList<>();
+        List<TableColumn> columns = getTableColumns();
+        for (TableColumn col : columns) {
+            String strVal = rs.getString(col.name());
+            values.add(DBUtil.getValue(strVal, col));
+        }
+
+        Class<?>[] paramTypes = columns.stream().map(TableColumn::type).toArray(Class<?>[]::new);
+
+        Constructor<R> rConstructor = recordClass.getConstructor(paramTypes);
+        return rConstructor.newInstance(values.toArray());
     }
 
     /**
@@ -315,20 +307,9 @@ public abstract class Table<K, R extends Record> {
         logStatement(sql);
         try (PreparedStatement stmt = database.getConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
-            List<TableColumn> columns = getTableColumns();
-
             while (rs.next()) {
-                List<Object> values = new ArrayList<>();
-                for (TableColumn col : columns) {
-                    String strVal = rs.getString(col.name());
-                    values.add(DBUtil.getValue(strVal, col));
-                }
 
-                Class<?>[] paramTypes = columns.stream().map(TableColumn::type).toArray(Class<?>[]::new);
-
-                Constructor<R> rConstructor = recordClass.getConstructor(paramTypes);
-                R record = rConstructor.newInstance(values.toArray());
-                list.add(record);
+                list.add(makeInstance(rs));
             }
 
         } catch (SQLException e) {

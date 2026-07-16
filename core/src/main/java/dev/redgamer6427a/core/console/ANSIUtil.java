@@ -8,8 +8,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * ANSI utilities.
+ */
 public class ANSIUtil {
-    public static String truncateAnsi(String s, int maxVisible, boolean front, boolean addElipsis) {
+    /**
+     * Truncates a terminal string while taking in account contained ascii codes.
+     * @param s the string to truncate
+     * @param maxVisible the max length of the string
+     * @param front whether to truncate the front
+     * @param addEllipsis whether to add ellipses at the truncated spot
+     * @return the properly truncated string.
+     */
+    public static String truncateAnsi(String s, int maxVisible, boolean front, boolean addEllipsis) {
         if (!front) {
             // existing end truncation logic
             StringBuilder result = new StringBuilder();
@@ -23,7 +34,7 @@ public class ANSIUtil {
                     result.append(s, i, end + 1);
                     i = end + 1;
                 } else {
-                    if (addElipsis) {
+                    if (addEllipsis) {
                         if (visible >= maxVisible - 3) {
                             result.append("...");
                             result.append("\033[0m");
@@ -50,7 +61,7 @@ public class ANSIUtil {
             // how many visible chars to skip from front
             int toSkip;
             StringBuilder result;
-            if (addElipsis) {
+            if (addEllipsis) {
                 toSkip = totalVisible - maxVisible + 3;
                 result = new StringBuilder("...");
             } else {

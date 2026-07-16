@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 @Getter
+/**
+ * A list of AnsiCodes for better readability and for ConsoleMiniMessage
+ */
 public enum ANSICode {
     // Bell
     BELL("bell", 0, "\007"),
@@ -112,10 +115,21 @@ public enum ANSICode {
 
 
     ;
-
+    /**
+     * The minimessage id.
+     */
     private final String id;
+    /**
+     * The amount of accepted parameters.
+     */
     private final int paramCount;
+    /**
+     * The actual code, optionally ready for insertion of parameters.
+     */
     private final String representation;
+    /**
+     * The default value for parameters.
+     */
     private final String[] defaults;
 
     ANSICode(String id, int paramCount, String representation, String... defaults) {
@@ -125,6 +139,11 @@ public enum ANSICode {
         this.defaults = defaults;
     }
 
+    /**
+     * Formats a code using parameters.
+     * @param args The parameters.
+     * @return This ANSICode with the parameters inserted.
+     */
     public String format(Object... args) {
         if (args.length > paramCount)
             throw new IllegalArgumentException("Expected " + paramCount + " args, got " + args.length);

@@ -1,7 +1,7 @@
 package dev.redgamer6427a.core.console.tui.core;
 
 import dev.redgamer6427a.core.console.input.KittyTerminalInput;
-import dev.redgamer6427a.core.console.input.RawTerminalInput;
+import dev.redgamer6427a.core.console.input.TerminalInput;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -20,8 +20,8 @@ public abstract class View {
 
     @SneakyThrows
     public void refresh() {
-        width = RawTerminalInput.getTerminal().getWidth();
-        height = RawTerminalInput.getTerminal().getHeight();
+        width = TerminalInput.getTerminal().getWidth();
+        height = TerminalInput.getTerminal().getHeight();
         String view = redraw(new TerminalBuilder(width, height)).render(1,1);
         System.out.print(view);
         Files.writeString(Path.of("tmp/tb_debug.txt"), view);

@@ -14,7 +14,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class RawTerminalInput {
+/**
+ * A very simple helper class for terminal input
+ */
+public class TerminalInput {
 
     private static boolean isRawMode = false;
     private static Thread inputThread;
@@ -26,6 +29,9 @@ public class RawTerminalInput {
     private static Attributes nonRawAttributes;
     private static PrintWriter out;
 
+    /**
+     * Starts raw mode.
+     */
     public static void startRaw() {
         if (isRawMode) return;
 
@@ -44,9 +50,13 @@ public class RawTerminalInput {
 
         isRawMode = true;
 
-        Runtime.getRuntime().addShutdownHook(new Thread(RawTerminalInput::stopRaw));
+        Runtime.getRuntime().addShutdownHook(new Thread(TerminalInput::stopRaw));
     }
 
+    /**
+     * Starts the kitty input mode.
+     * @see KittyTerminalInput
+     */
     public static void startKitty() {
         try {
             new ProcessBuilder("stty", "-icanon", "-echo")
@@ -67,6 +77,10 @@ public class RawTerminalInput {
         out.flush();
     }
 
+    /**
+     * Stops the kitty input mode.
+     * @see KittyTerminalInput
+     */
     public static void stopKitty() {
         // Disable mouse reporting
         out.write("\033[?1000l");
@@ -77,6 +91,9 @@ public class RawTerminalInput {
         out.flush();
     }
 
+    /**
+     * Exits raw mode.
+     */
     public static void stopRaw() {
         if (!isRawMode) return;
         stopKitty();
@@ -91,8 +108,15 @@ public class RawTerminalInput {
         }
     }
 
+    /**
+     * A list of all InputHooks (not KittyInputHooks).
+     */
     private static final Map<UUID, InputHook> inputHooks = new LinkedHashMap<>();
 
+    /**
+     * Creates and registers an InputHook
+     * @return the InputHook
+     */
     public static InputHook makeHook() {
 
         UUID uuid = UUID.randomUUID();
@@ -127,6 +151,10 @@ public class RawTerminalInput {
 
     }
 
+    /**
+     * Unregisters and handles the closing of an InputHook.
+     * @param uuid the uuid of this hook.
+     */
     private static void stopInput(UUID uuid) {
         inputHooks.remove(uuid);
         if (inputHooks.isEmpty()) {
@@ -140,6 +168,9 @@ public class RawTerminalInput {
         }
     }
 
+    /**
+     * Closes all InputHooks.
+     */
     public static void closeAll() {
         for (InputHook hook : inputHooks.values().toArray(new InputHook[0])) {
             hook.close();

@@ -96,7 +96,7 @@ public class KittyTerminalInput {
     // -------------------------------------------------------------------------
 
     private static void startListener() {
-        inputHook = RawTerminalInput.makeHook();
+        inputHook = TerminalInput.makeHook();
         // The buffer accumulates bytes between ESC and a terminator.
         AtomicReference<String> buf = new AtomicReference<>("");
 
@@ -450,7 +450,7 @@ public class KittyTerminalInput {
         inputHooks.put(uuid, hook);
         if (inputHooks.size() == 1) {
             startListener();
-            RawTerminalInput.startKitty();
+            TerminalInput.startKitty();
         }
         return hook;
     }
@@ -459,7 +459,7 @@ public class KittyTerminalInput {
         inputHooks.remove(uuid);
         if (inputHooks.isEmpty()) {
             inputHook.close();
-            RawTerminalInput.stopKitty();
+            TerminalInput.stopKitty();
             inputHook = null;
         }
     }

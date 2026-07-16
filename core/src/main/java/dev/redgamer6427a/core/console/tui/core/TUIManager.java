@@ -2,7 +2,7 @@ package dev.redgamer6427a.core.console.tui.core;
 
 import dev.redgamer6427a.core.console.input.KittyInputHook;
 import dev.redgamer6427a.core.console.input.KittyTerminalInput;
-import dev.redgamer6427a.core.console.input.RawTerminalInput;
+import dev.redgamer6427a.core.console.input.TerminalInput;
 import dev.redgamer6427a.core.logging.Logger;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
@@ -43,9 +43,9 @@ public class TUIManager {
     public static void start() {
 
         try {
-            RawTerminalInput.startRaw();
+            TerminalInput.startRaw();
 
-            RawTerminalInput.getTerminal().handle(Terminal.Signal.WINCH, signal -> currentView.refresh());
+            TerminalInput.getTerminal().handle(Terminal.Signal.WINCH, signal -> currentView.refresh());
 
             hook = KittyTerminalInput.makeHook();
             hook.onKeyExecutor(TUIManager::keyEvent);

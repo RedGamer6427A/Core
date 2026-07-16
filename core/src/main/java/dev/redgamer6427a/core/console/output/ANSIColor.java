@@ -2,6 +2,9 @@ package dev.redgamer6427a.core.console.output;
 
 import lombok.Getter;
 
+/**
+ * The integer value used in ansi color tags for default colors
+ */
 @Getter
 public enum ANSIColor {
     BLACK("&black", 30),

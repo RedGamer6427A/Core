@@ -6,16 +6,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Similar to InputHook, but using the <a href="https://sw.kovidgoyal.net/kitty/keyboard-protocol/">kitty terminal input protocol<a/>.
+ */
 public class KittyInputHook {
 
+    /**
+     * Executors to be executed on keystroke.
+     */
     private final List<Consumer<KittyTerminalInput.KeyEvent>> keyExecutors = new ArrayList<>();
+    /**
+     * Executors to be executed on mouse interaction.
+     */
     private final List<Consumer<KittyTerminalInput.MouseEvent>> mouseExecutors = new ArrayList<>();
 
     private final Runnable onClose;
     /**
-     * -- GETTER --
      *  Check if this hook is closed.
-     *
      */
     @Getter
     private boolean closed;

@@ -130,9 +130,7 @@ public class ClientConnection implements Runnable {
                     error(MessageBusBrokerResponses.ALREADY_AUTHORIZED.getCode());
                     return;
                 }
-                byte[] idField = new byte[ID_LENGTH];
-                buf.get(idField);
-                String clientId = MessageBusUtil.fromFixedField(idField);
+                String clientId = getField(buf, ID_LENGTH);
 
                 byte[] passField = new byte[PASS_LENGTH];
                 buf.get(passField);
@@ -173,9 +171,7 @@ public class ClientConnection implements Runnable {
 
                 byte flags = buf.get();
 
-                byte[] destField = new byte[ID_LENGTH];
-                buf.get(destField);
-                String destination = MessageBusUtil.fromFixedField(destField);
+                String destination = getField(buf, ID_LENGTH);
 
                 byte[] jsonBytes = new byte[buf.remaining()];
                 buf.get(jsonBytes);
@@ -200,6 +196,14 @@ public class ClientConnection implements Runnable {
         }
 
         ackFrame();
+    }
+
+    private String getField(ByteBuffer buf, int length) {
+        byte[] field = new byte[length];
+        buf.get(field);
+        return MessageBusUtil.fromFixedField(field);
+
+
     }
 
     private void ackFrame() throws IOException {

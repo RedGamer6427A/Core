@@ -4,6 +4,7 @@ import dev.redgamer6427a.core.processing.Format;
 import dev.redgamer6427a.core.processing.Parameterize;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Date;
@@ -52,6 +53,7 @@ public class Logger {
 
     /**
      * A protected constructor
+     *
      * @param clazz the class to use
      */
     protected Logger(Class<?> clazz) {
@@ -60,6 +62,7 @@ public class Logger {
 
     /**
      * A factory method that creates a Logger assigned to the caller class
+     *
      * @return A logger
      */
     public static Logger create() {
@@ -74,6 +77,7 @@ public class Logger {
 
     /**
      * A factory method that creates a Logger
+     *
      * @param clazz the class to use
      * @return A logger
      */
@@ -90,8 +94,9 @@ public class Logger {
 
     /**
      * Log a message to console and sink.
-     * @param level the level of the log
-     * @param message a parameterized message
+     *
+     * @param level      the level of the log
+     * @param message    a parameterized message
      * @param parameters parameters
      */
     public void log(Level level, String message, Object... parameters) {
@@ -115,8 +120,7 @@ public class Logger {
                 //no-inspect varargs
                 .replace("<msg>", Parameterize.parameterize(message, true, true, parameters))
                 .replace("<thread>", threadName)
-                .replace("<levelNamePadding>", getLevelPadding(level))
-                ;
+                .replace("<levelNamePadding>", getLevelPadding(level));
         String rendered = mm(output);
         origin = clazz.getPackageName() + "." + clazz.getSimpleName();
 
@@ -134,6 +138,7 @@ public class Logger {
 
     /**
      * Gets a level's padding for output format
+     *
      * @param level the level to pad
      * @return the padding for that level
      */
@@ -151,47 +156,58 @@ public class Logger {
 
     /**
      * Helper method for logging a FINEST message.
-     * @param message a parameterized message.
+     *
+     * @param message    a parameterized message.
      * @param parameters parameters
      */
     public void finest(String message, Object... parameters) {
         log(Level.FINEST, message, parameters);
     }
+
     /**
      * Helper method for logging a FINE message.
-     * @param message a parameterized message.
+     *
+     * @param message    a parameterized message.
      * @param parameters parameters
      */
     public void fine(String message, Object... parameters) {
         log(Level.FINE, message, parameters);
     }
+
     /**
      * Helper method for logging an INFO message.
-     * @param message a parameterized message.
+     *
+     * @param message    a parameterized message.
      * @param parameters parameters
      */
     public void info(String message, Object... parameters) {
         log(Level.INFO, message, parameters);
     }
+
     /**
      * Helper method for logging a WARNING message.
-     * @param message a parameterized message.
+     *
+     * @param message    a parameterized message.
      * @param parameters parameters
      */
     public void warning(String message, Object... parameters) {
         log(Level.WARNING, message, parameters);
     }
+
     /**
      * Helper method for logging an ERROR message.
-     * @param message a parameterized message.
+     *
+     * @param message    a parameterized message.
      * @param parameters parameters
      */
     public void error(String message, Object... parameters) {
         log(Level.ERROR, message, parameters);
     }
+
     /**
      * Helper method for logging a CRITICAL message.
-     * @param message a parameterized message.
+     *
+     * @param message    a parameterized message.
      * @param parameters parameters
      */
     public void critical(String message, Object... parameters) {
@@ -200,34 +216,23 @@ public class Logger {
 
     /**
      * Declare the catching of an exception in the logs.
+     *
      * @param exception the caught exception
      */
     public void catching(Exception exception) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(exception.getClass().getName()).append(": ").append(exception.getMessage());
-        for (StackTraceElement element : exception.getStackTrace()) {
-            sb.append("\n    at ").append(element);
-        }
-        // causes
-        Throwable cause = exception.getCause();
-        while (cause != null) {
-            sb.append("\nCaused by: ").append(cause.getClass().getName()).append(": ").append(cause.getMessage());
-            for (StackTraceElement element : cause.getStackTrace()) {
-                sb.append("\n    at ").append(element);
-            }
-            cause = cause.getCause();
-        }
-        log(Level.ERROR, sb.toString());
+        catching(null, exception);
     }
 
     /**
      * Declare the catching of an exception in the logs.
+     *
+     * @param msg       the message to go along
      * @param exception the caught exception
      */
-    public void catching(String s, Exception exception) {
+    public void catching(@Nullable String msg, Exception exception) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("CATCHING! ").append(s).append("\n");
+        if (msg != null) sb.append("CATCHING! ").append(msg).append("\n");
         sb.append(exception.getClass().getName()).append(": ").append(exception.getMessage());
         for (StackTraceElement element : exception.getStackTrace()) {
             sb.append("\n    at ").append(element);
@@ -247,12 +252,13 @@ public class Logger {
 
     /**
      * Declare the throwing of an exception
+     *
      * @param exception the thrown exception
+     * @param <T>       the exception class
      * @return that same exception for ease of use
-     * @param <T> the exception class
      */
     public <T extends Throwable> T throwing(T exception) {
-        log(Level.ERROR, "Throwing "+exception.getClass().getSimpleName()+": "+exception.getMessage());
+        log(Level.ERROR, "Throwing " + exception.getClass().getSimpleName() + ": " + exception.getMessage());
         return exception; // so you can: throw log.throwing(new Exception())
     }
 

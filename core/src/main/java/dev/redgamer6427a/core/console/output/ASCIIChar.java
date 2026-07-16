@@ -2,6 +2,9 @@ package dev.redgamer6427a.core.console.output;
 
 import lombok.Getter;
 
+/**
+ * Useful ASCII Characters
+ */
 @Getter
 public enum ASCIIChar {
     // Box characters
