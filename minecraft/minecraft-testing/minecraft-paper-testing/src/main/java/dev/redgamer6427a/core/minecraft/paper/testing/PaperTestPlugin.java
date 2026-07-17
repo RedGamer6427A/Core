@@ -6,24 +6,20 @@ import dev.redgamer6427a.core.messagebus.client.MessageBusClient;
 import dev.redgamer6427a.core.messagebus.packet.Packets;
 import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
+import dev.redgamer6427a.core.minecraft.paper.protocol.PacketInterceptor;
 import dev.redgamer6427a.core.minecraft.paper.testing.command.*;
 import dev.redgamer6427a.core.minecraft.paper.testing.messaging.CommandBroadcastPacket;
-import dev.redgamer6427a.core.minecraft.paper.util.PaperParameters;
+import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import org.bukkit.Bukkit;
-import org.bukkit.permissions.Permission;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
+
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
 
 public class PaperTestPlugin extends PaperPlugin {
 
     private static final Logger logger = Logger.create();
 
-
-    @Override
-    public @NonNull PaperParameters getParameters() {
-        return new PaperParameters(new Permission("papertest.verbose"), null, false, false);
-    }
 
     public MessageBusClient client;
 
@@ -54,7 +50,7 @@ public class PaperTestPlugin extends PaperPlugin {
                 if (!packet) {
                     try {
                         MessagingHandler.handle(message);
-                    }   catch (Exception e) {
+                    } catch (Exception e) {
                         logger.catching(e);
                     }
                 }
@@ -73,6 +69,26 @@ public class PaperTestPlugin extends PaperPlugin {
 
         });
 
+        PacketInterceptor.addHandler(ServerboundChatPacket.class, (packet, context) -> {
+            if (packet.message().contains("cancel")){
+                Bukkit.getScheduler().callSyncMethod(this, () -> {
+
+                    context.getPlayer().getPlayer().kick(mm("<red>That message was <dark_red>WAY <red>too funny! Cancelling..."));
+                    return null;
+                });
+                context.setCancelled(true);
+
+            }
+
+        });
+        PacketInterceptor.enable();
+
+
+    }
+
+    @Override
+    public String getVerboseAnswerPermission() {
+        return "papertest.verbose";
     }
 
     @Override

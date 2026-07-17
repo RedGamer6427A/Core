@@ -3,18 +3,14 @@ package dev.redgamer6427a.core.minecraft.paper;
 import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
-import dev.redgamer6427a.core.performance.Performance;
-import dev.redgamer6427a.core.minecraft.common.util.AMPIntegration;
 import dev.redgamer6427a.core.minecraft.paper.command.BrigadierCommandManager;
 import dev.redgamer6427a.core.minecraft.paper.menu.MenuEventHandler;
-import dev.redgamer6427a.core.minecraft.paper.util.PaperParameters;
+import dev.redgamer6427a.core.minecraft.paper.protocol.PacketInterceptor;
 import dev.redgamer6427a.core.minecraft.paper.util.EventDefiner;
-import dev.redgamer6427a.core.minecraft.paper.util.FunnyPaperAMPIntegration;
-import dev.redgamer6427a.core.minecraft.paper.util.PaperAMPIntegration;
+import dev.redgamer6427a.core.performance.Performance;
 import lombok.Getter;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.mm;
 
@@ -34,14 +30,19 @@ public abstract class PaperPlugin extends JavaPlugin {
 
     @Override
     public final void onDisable() {
-        long m = Performance.measure(this::disable);
-        logger().warn(mm("Shut down. (" + m + "ms)"));
+
+        long m = Performance.measure(() -> {
+            PacketInterceptor.disable();
+            disable();
+
+        });
+        logger().info(mm("Shut down. (" + m + "ms)"));
         instance = null;
+        // execute any code here? die.
     }
 
-    public abstract @NotNull PaperParameters getParameters();
 
-    private AMPIntegration AMP;
+    public abstract String getVerboseAnswerPermission();
 
     @Override
     public final void onEnable() {
@@ -55,23 +56,18 @@ public abstract class PaperPlugin extends JavaPlugin {
             }
             instance = this;
 
-            if (getParameters().AMPKey() != null) {
-                if (getParameters().funnyAMPVersion()){
-                    AMP = new FunnyPaperAMPIntegration(getParameters().AMPKey());
-                    AMP.shutdownOnInvalid();
-                } else {
-                    AMP = new PaperAMPIntegration(getParameters().AMPKey());
-                    AMP.shutdownOnInvalid();
-                }
-            }
+
             ConsoleMiniMessage.initDefaultColors();
             AdventureMM.buildParser();
             beforeEnable();
 
             defineConfigurations();
 
-            new EventDefiner().define(new MenuEventHandler());
-            defineEvents(new EventDefiner());
+            EventDefiner eventDefiner = new EventDefiner();
+
+            eventDefiner.define(new MenuEventHandler());
+            eventDefiner.define(new PacketInterceptor());
+            defineEvents(eventDefiner);
 
             defineCommands();
             BrigadierCommandManager.processQueue();

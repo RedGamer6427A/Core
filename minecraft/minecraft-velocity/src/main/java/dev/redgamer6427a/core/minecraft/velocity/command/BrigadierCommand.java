@@ -247,7 +247,7 @@ public abstract class BrigadierCommand {
     public static void answer(CommandContext<CommandSource> context, Component message, Component adminMessage) {
         CommandSource source = context.getSource();
 
-        if(context.getSource().hasPermission(VelocityPlugin.getInstance().getDeveloperPermission())){
+        if(context.getSource().hasPermission(VelocityPlugin.getInstance().getVerboseAnswerPermission())){
             if (source instanceof ConsoleCommandSource) {
                 source.sendMessage(mm(mmToConsole(adminMessage) + TerminalStyle.RESET));
             } else {

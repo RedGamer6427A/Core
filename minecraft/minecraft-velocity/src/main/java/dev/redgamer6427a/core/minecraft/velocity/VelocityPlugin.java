@@ -43,7 +43,7 @@ public abstract class VelocityPlugin {
     @Getter
     protected final ExecutorService executorService;
 
-    public abstract String getDeveloperPermission();
+    public abstract String getVerboseAnswerPermission();
 
     private static final Logger logger = Logger.create();
 

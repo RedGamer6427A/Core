@@ -1,9 +1,9 @@
 package dev.redgamer6427a.core.minecraft.paper.player;
 
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
-import lombok.Getter;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -13,14 +13,13 @@ import java.util.*;
 public class ExtendedPlayer {
 
     public static List<Class<? extends PlayerModule>> registeredModuleClasses = new ArrayList<>();
-    @Getter
-    final private Player player;
+    private final UUID uuid;
     private final List<PlayerModule> ownModules;
 
     private static final Map<UUID, ExtendedPlayer> instances = new HashMap<>();
 
     private ExtendedPlayer(Player player) {
-        this.player = player;
+        this.uuid = player.getUniqueId();
         ownModules = new ArrayList<>();
         for (Class<? extends PlayerModule> registeredModuleClass : registeredModuleClasses) {
             try {
@@ -57,11 +56,14 @@ public class ExtendedPlayer {
     }
 
     public ServerPlayer getServerPlayer() {
-        return ((CraftPlayer) player).getHandle();
+        return ((CraftPlayer) getPlayer()).getHandle();
     }
 
-    public void sendPacket(Packet<?> packet){
+    public void sendPacket(Packet<?> packet) {
         getServerPlayer().connection.send(packet);
     }
 
+    public Player getPlayer() {
+        return Bukkit.getPlayer(uuid);
+    }
 }

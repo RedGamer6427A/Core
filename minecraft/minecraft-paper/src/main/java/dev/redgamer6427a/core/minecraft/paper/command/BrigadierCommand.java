@@ -298,7 +298,7 @@ public abstract class BrigadierCommand {
         CommandSourceStack source = context.getSource();
 
 
-        if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getParameters().verbosePermission())) {
+        if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getVerboseAnswerPermission())) {
             if (source.getSender() instanceof ConsoleCommandSender) {
                 source.getSender().sendMessage(ConsoleMiniMessage.mm(AdventureMM.serialize(adminMessage) + TerminalStyle.RESET));
             } else {
@@ -325,7 +325,7 @@ public abstract class BrigadierCommand {
         CommandSourceStack source = context.getSource();
 
 
-        if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getParameters().verbosePermission())) {
+        if (context.getSource().getSender().hasPermission(PaperPlugin.getInstance().getVerboseAnswerPermission())) {
             if (source.getSender() instanceof ConsoleCommandSender) {
                 source.getSender().sendMessage(ConsoleMiniMessage.mm(adminMessage + TerminalStyle.RESET));
             } else {

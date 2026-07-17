@@ -60,7 +60,7 @@ public class VelocityTest extends VelocityPlugin {
     }
 
     @Override
-    public String getDeveloperPermission() {
+    public String getVerboseAnswerPermission() {
         return "q1092313oifiughj";
     }
 }
