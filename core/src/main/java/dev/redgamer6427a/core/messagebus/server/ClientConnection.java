@@ -38,7 +38,6 @@ import static dev.redgamer6427a.core.messagebus.MessageBusConstants.*;
  * 5 - ratelimited
  */
 
-// TODO: put error numbers into constants
 public class ClientConnection implements Runnable {
 
 
@@ -191,9 +190,9 @@ public class ClientConnection implements Runnable {
                 boolean isUrgent = (flags & FLAG_URGENT) != 0; // Coming through!!!!
                 Message message = new Message(destination, clientId, contents, isUrgent);
                 if (isUrgent) {
-                    brokerThread.getMessages().addFirst(message);
+                    brokerThread.getMessages().addFirst(Map.entry(message, this));
                 } else {
-                    brokerThread.getMessages().add(message);
+                    brokerThread.getMessages().addLast(Map.entry(message, this));
                 }
 
             }
@@ -209,6 +208,8 @@ public class ClientConnection implements Runnable {
 
         ackFrame();
     }
+
+
 
     private String getField(ByteBuffer buf, int length) {
         byte[] field = new byte[length];

@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.Message;
 import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponses;
+import dev.redgamer6427a.core.messagebus.MessageBusConstants;
 import dev.redgamer6427a.core.messagebus.MessageBusUtil;
 import lombok.Getter;
 
@@ -133,8 +134,21 @@ public class MessageBusClient {
                 sendFrame(buffer.array());
                 byte res = awaitResponse()[0];
                 if ((int) res != MessageBusBrokerResponses.ALL_GOOD.getCode()){
+
+                    MessageBusBrokerResponses resE = MessageBusBrokerResponses.fromCode(res);
+                    if (resE == null) {
+                        logger.error("Heartbeat response is invalid! {}"+res);
+                        return;
+                    }
                     logger.warning("Heartbeat response is not ok {}", MessageBusBrokerResponses.fromCode(res));
-// TODO: Handle err codes and add reconnect
+                    if (resE == MessageBusBrokerResponses.NOT_AUTHORIZED) {
+                        logger.error("Client sent an unauthorized heartbeat! Reconnecting...");
+                        reconnect();
+                    } else {
+                        logger.error("Heartbeat response makes no sense! Reconnecting... {}" + res);
+                        reconnect();
+                    }
+
                 } else {
                     logger.fine("Heartbeat ok!");
                     lastHeartbeat = System.currentTimeMillis();

@@ -23,12 +23,12 @@ public class VelocityTest {
         logger.info("Core Velocity Testing Plugin Initialized.");
         brokerThread = new BrokerThread(12443, "just_a_pass");
         new Thread(brokerThread).start();
-        BrokerProcessor brokerProcessor = new BrokerProcessor(brokerThread, message -> {
+        BrokerProcessor brokerProcessor = new BrokerProcessor(brokerThread, (message, clientConnection) -> {
             logger.info("Message: {}", message);
 
         });
 
-        brokerProcessor.setConsumer(message -> {
+        brokerProcessor.setConsumer((message, clientConnection) -> {
             logger.info("Message: {}", message);
             if (!Objects.equals(message.sender(), "broker")) {
                 brokerProcessor.dispatch(new Message("*", "broker", Map.of("message", "recieved"), false));

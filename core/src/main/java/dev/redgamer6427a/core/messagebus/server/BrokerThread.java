@@ -51,7 +51,7 @@ public class BrokerThread implements Runnable {
     private Map<String, ClientConnection> connections = new ConcurrentHashMap<>();
 
     @Getter
-    private final LinkedBlockingDeque<Message> messages = new LinkedBlockingDeque<>();
+    private final LinkedBlockingDeque<Map.Entry<Message, ClientConnection>> messages = new LinkedBlockingDeque<>();
 
     private SSLServerSocket serverSocket;
     private final ExecutorService clientPool = Executors.newVirtualThreadPerTaskExecutor();
@@ -224,8 +224,8 @@ public class BrokerThread implements Runnable {
         Thread dispatcher = new Thread(() -> {
             while (isRunning) {
                 try {
-                    Message msg = messages.take(); // blocks until available
-                    dispatch(msg);
+                    Map.Entry<Message, ClientConnection> msg = messages.take(); // blocks until available
+                    dispatch(msg.getKey(), msg.getValue());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
@@ -236,10 +236,10 @@ public class BrokerThread implements Runnable {
         dispatcher.start();
     }
 
-    public void dispatch(Message msg) {
+    public void dispatch(Message msg, ClientConnection connection) {
 
         for (BrokerProcessor processor : brokerProcessors) {
-            processor.getConsumer().accept(msg);
+            processor.getConsumer().accept(msg, Optional.ofNullable(connection));
         }
 
         List<ClientConnection> targets = connections.entrySet().stream()
