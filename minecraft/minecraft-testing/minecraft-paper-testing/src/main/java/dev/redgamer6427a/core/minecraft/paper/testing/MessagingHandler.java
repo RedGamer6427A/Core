@@ -46,7 +46,7 @@ private static final Logger logger = Logger.create();
         if (data.get("eventType").equals("reload-all")) {
             Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(mm("<blue>Global Reload...")));
             logger.info("Global reload!");
-            Bukkit.getServer().reload();
+            Bukkit.getScheduler().callSyncMethod(PaperTestPlugin.getInstance(), () -> {Bukkit.getServer().reload();return null;});
         }
     }
 

@@ -2,7 +2,7 @@ package dev.redgamer6427a.core.messagebus;
 
 import lombok.Getter;
 
-public enum MessageBusBrokerResponses {
+public enum MessageBusBrokerResponse {
     ALL_GOOD(0),
     BAD_PASSWORD(1),
     MALFORMED_JSON(2),
@@ -15,12 +15,12 @@ public enum MessageBusBrokerResponses {
     @Getter
     private final int code;
 
-    MessageBusBrokerResponses(int code) {
+    MessageBusBrokerResponse(int code) {
         this.code = code;
     }
 
-    public static MessageBusBrokerResponses fromCode(int code) {
-        for (MessageBusBrokerResponses value : MessageBusBrokerResponses.values()) {
+    public static MessageBusBrokerResponse fromCode(int code) {
+        for (MessageBusBrokerResponse value : MessageBusBrokerResponse.values()) {
             if (value.code == code) {
                 return value;
             }

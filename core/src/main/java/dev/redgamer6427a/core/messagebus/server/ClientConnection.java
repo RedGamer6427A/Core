@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.Message;
-import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponses;
+import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponse;
 import dev.redgamer6427a.core.messagebus.MessageBusUtil;
 import lombok.Getter;
 
@@ -94,7 +94,7 @@ public class ClientConnection implements Runnable {
             throw new IOException("Invalid frame length: " + length);
         }
         if (length > MAX_FRAME_SIZE) {
-            error(MessageBusBrokerResponses.FRAME_TOO_LARGE.getCode()); // new code: frame too large
+            error(MessageBusBrokerResponse.FRAME_TOO_LARGE.getCode()); // new code: frame too large
             out.flush();
             // still need to drain the oversized payloaEOFExceptiond off the stream, or next read desyncs
             in.skipNBytes(length);
@@ -130,7 +130,7 @@ public class ClientConnection implements Runnable {
         switch (type) {
             case TYPE_SUBSCRIBE -> {
                 if (authorized) {
-                    error(MessageBusBrokerResponses.ALREADY_AUTHORIZED.getCode());
+                    error(MessageBusBrokerResponse.ALREADY_AUTHORIZED.getCode());
                     return;
                 }
                 String clientId = getField(buf, ID_LENGTH);
@@ -142,7 +142,7 @@ public class ClientConnection implements Runnable {
 
                     this.clientId = clientId;
                     if (brokerThread.registerClient(this) != null) {
-                        error(MessageBusBrokerResponses.CLIENT_ID_ALREADY_IN_USE.getCode());
+                        error(MessageBusBrokerResponse.CLIENT_ID_ALREADY_IN_USE.getCode());
                         out.flush();
                         socket.close();
                         return;
@@ -156,7 +156,7 @@ public class ClientConnection implements Runnable {
                     this.clientId = clientId;
                     try {
                         brokerThread.recordAuthFailure(socket.getInetAddress().getHostAddress());
-                        error(MessageBusBrokerResponses.BAD_PASSWORD.getCode());
+                        error(MessageBusBrokerResponse.BAD_PASSWORD.getCode());
                         out.flush();
                     } finally {
                         socket.close();
@@ -168,7 +168,7 @@ public class ClientConnection implements Runnable {
             }
             case TYPE_MESSAGE -> {
                 if (!authorized) {
-                    error(MessageBusBrokerResponses.NOT_AUTHORIZED.getCode());
+                    error(MessageBusBrokerResponse.NOT_AUTHORIZED.getCode());
                     return;
                 }
 
@@ -184,7 +184,7 @@ public class ClientConnection implements Runnable {
                     contents = JsonParser.parseString(json).getAsJsonObject().asMap().entrySet().stream()
                             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getAsString()));
                 } catch (Exception e) {
-                    error(MessageBusBrokerResponses.MALFORMED_JSON.getCode());
+                    error(MessageBusBrokerResponse.MALFORMED_JSON.getCode());
                     return;
                 }
                 boolean isUrgent = (flags & FLAG_URGENT) != 0; // Coming through!!!!
@@ -198,7 +198,7 @@ public class ClientConnection implements Runnable {
             }
             case TYPE_HEARTBEAT -> {
                 if (!authorized) {
-                    error(MessageBusBrokerResponses.NOT_AUTHORIZED.getCode());
+                    error(MessageBusBrokerResponse.NOT_AUTHORIZED.getCode());
                     out.flush();
                     socket.close();
                     return;
@@ -222,7 +222,7 @@ public class ClientConnection implements Runnable {
     private void ackFrame() throws IOException {
         logger.finest("Acknowledging frame");
         ByteBuffer buf = ByteBuffer.allocate(1);
-        buf.put((byte) MessageBusBrokerResponses.ALL_GOOD.getCode());
+        buf.put((byte) MessageBusBrokerResponse.ALL_GOOD.getCode());
         sendResponse(buf.array());
     }
 
@@ -230,7 +230,7 @@ public class ClientConnection implements Runnable {
         ByteBuffer buf = ByteBuffer.allocate(1);
         buf.put((byte) code);
 
-        logger.warning("Client connection error: {} (ip: {}, authorized: {}, id: '{}', port: {})", MessageBusBrokerResponses.fromCode(code), socket.getInetAddress().getHostAddress(), authorized, clientId, socket.getPort());
+        logger.warning("Client connection error: {} (ip: {}, authorized: {}, id: '{}', port: {})", MessageBusBrokerResponse.fromCode(code), socket.getInetAddress().getHostAddress(), authorized, clientId, socket.getPort());
 
         sendResponse(buf.array());
 

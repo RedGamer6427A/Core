@@ -1,7 +1,6 @@
 package dev.redgamer6427a.core.minecraft.paper.testing.command;
 
 import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
-import dev.redgamer6427a.core.minecraft.paper.command.AllowedSources;
 import dev.redgamer6427a.core.minecraft.paper.command.BrigadierCommand;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -28,7 +27,7 @@ public class SubCommand extends BrigadierCommand {
 
 
             }
-        }, AllowedSources.PLAYER);
+        });
     }
 
 }

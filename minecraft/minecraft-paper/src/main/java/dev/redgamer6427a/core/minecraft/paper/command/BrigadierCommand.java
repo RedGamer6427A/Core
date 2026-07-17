@@ -4,6 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
 import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
@@ -14,10 +15,9 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.BlockCommandSender;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 import java.util.*;
@@ -100,21 +100,19 @@ public abstract class BrigadierCommand {
      * Sets the default executor.
      *
      * @param command        the executed code
-     * @param allowedSources allowed command sources (e.g. player, console)
      * @param requirement    an optional Brigadier requirement predicate
      */
-    public void setDefaultExecutor(CommandRunner<CommandSourceStack> command, AllowedSources allowedSources, Predicate<CommandSourceStack> requirement) {
-        this.defaultExecutor = new Executor(command, allowedSources, requirement);
+    public void setDefaultExecutor(CommandRunner<CommandSourceStack> command, Predicate<CommandSourceStack> requirement) {
+        this.defaultExecutor = new Executor(command, requirement);
     }
 
     /**
      * Sets the default executor without a requirement.
      *
      * @param command        the executed code
-     * @param allowedSources allowed command sources
      */
-    public void setDefaultExecutor(CommandRunner<CommandSourceStack> command, AllowedSources allowedSources) {
-        this.defaultExecutor = new Executor(command, allowedSources, null);
+    public void setDefaultExecutor(CommandRunner<CommandSourceStack> command) {
+        this.defaultExecutor = new Executor(command, null);
     }
 
     /**
@@ -127,6 +125,22 @@ public abstract class BrigadierCommand {
         BrigadierCommandManager.queueCommandRegistration(this);
     }
 
+    private static final ThreadLocal<CommandContext<CommandSourceStack>> CURRENT_CONTEXT = new ThreadLocal<>();
+
+    private static int runWithContext(CommandContext<CommandSourceStack> context, CommandRunner<CommandSourceStack> runner) throws CommandSyntaxException {
+        if (!Bukkit.isPrimaryThread()) {
+            throw new IllegalStateException("Command executor ran off main thread — this should be impossible under normal dispatch.");
+        }
+        CommandContext<CommandSourceStack> previous = CURRENT_CONTEXT.get();
+        CURRENT_CONTEXT.set(context);
+        try {
+            runner.run(context);
+            return Command.SINGLE_SUCCESS;
+        } finally {
+            CURRENT_CONTEXT.set(previous);
+        }
+    }
+
     /**
      * Internal helper to construct the Brigadier literal command node.
      *
@@ -135,17 +149,14 @@ public abstract class BrigadierCommand {
     public LiteralCommandNode<CommandSourceStack> build() {
         builder = Commands.literal(literal);
         if (defaultExecutor != null) {
-            Predicate<CommandSourceStack> p = allowedSources(defaultExecutor.allowedSources());
+
 
             if (defaultExecutor.requirement() != null) {
-                p = p.and(defaultExecutor.requirement());
+                builder.requires(defaultExecutor.requirement());
             }
 
-            builder.requires(p);
-            builder.executes(context -> {
-                defaultExecutor.command().run(context);
-                return Command.SINGLE_SUCCESS;
-            });
+
+            builder.executes(context -> runWithContext(context, defaultExecutor.command()));
 
         } else {
             builder.requires(collectRequirements(this));
@@ -163,19 +174,16 @@ public abstract class BrigadierCommand {
                 if (i == 1) {
                     e = argument.asArgument();
 
-                    e.executes(context -> {
-                        syntaxTree.context().run(context);
-                        return Command.SINGLE_SUCCESS;
-                    });
+                    e.executes(context -> runWithContext(context, syntaxTree.context()));
                 } else {
                     e = argument.asArgument().then(e);
                 }
             }
 
             if (syntaxTree.requirement() != null) {
-                builder.requires(mergeRequirements(syntaxTree.requirement(), allowedSources(syntaxTree.allowedSources()))).then(e);
+                builder.requires(syntaxTree.requirement()).then(e);
             } else if (defaultExecutor != null && defaultExecutor.requirement() != null) {
-                builder.requires(mergeRequirements(defaultExecutor.requirement(), allowedSources(defaultExecutor.allowedSources()))).then(e);
+                builder.requires(defaultExecutor.requirement()).then(e);
             } else {
                 builder.then(e);
             }
@@ -190,44 +198,26 @@ public abstract class BrigadierCommand {
         return node;
     }
 
-    /**
-     * Checks allowed command sources (player, console, command block).
-     *
-     * @param allowedSources the allowed sources
-     */
-    private static Predicate<CommandSourceStack> allowedSources(AllowedSources allowedSources) {
-        return cs -> {
-            CommandSender sender = cs.getSender();
-            if (!allowedSources.isCanPlayer() && sender instanceof Player) return false;
-            if (!allowedSources.isCanConsole() && sender instanceof ConsoleCommandSender) return false;
-            if (!allowedSources.isCanCommandBlock() && sender instanceof BlockCommandSender) return false;
-
-            return true;
-        };
-    }
-
 
     /**
      * Adds a possible command syntax with a requirement.
      *
      * @param command        the executed code
-     * @param allowedSources allowed command sources
      * @param requirement    the Brigadier requirement predicate
      * @param arguments      the syntax structure based on arguments
      */
-    public void addSyntax(CommandRunner<CommandSourceStack> command, AllowedSources allowedSources, Predicate<CommandSourceStack> requirement, Argument... arguments) {
-        syntaxTrees.add(new SyntaxTree(command, allowedSources, requirement, Arrays.stream(arguments).toList()));
+    public void addSyntax(CommandRunner<CommandSourceStack> command, Predicate<CommandSourceStack> requirement, Argument... arguments) {
+        syntaxTrees.add(new SyntaxTree(command, requirement, Arrays.stream(arguments).toList()));
     }
 
     /**
      * Adds a possible command syntax without a requirement.
      *
      * @param command        the executed code
-     * @param allowedSources allowed command sources
      * @param arguments      the syntax structure based on arguments
      */
-    public void addSyntax(CommandRunner<CommandSourceStack> command, AllowedSources allowedSources, Argument... arguments) {
-        syntaxTrees.add(new SyntaxTree(command, allowedSources, null, Arrays.stream(arguments).toList()));
+    public void addSyntax(CommandRunner<CommandSourceStack> command, Argument... arguments) {
+        syntaxTrees.add(new SyntaxTree(command,null, Arrays.stream(arguments).toList()));
     }
 
     /**
@@ -240,6 +230,30 @@ public abstract class BrigadierCommand {
     }
 
     // ------------------ Static utility methods ------------------
+    // ok these are not THAT static lol
+    public static void answer(Component message) {
+        answer(requireContext(), message);
+    }
+
+    public static void answer(String message) {
+        answer(requireContext(), message);
+    }
+
+    public static void answer(Component message, Component adminMessage) {
+        answer(requireContext(), message, adminMessage);
+    }
+
+    public static void answer(String message, String adminMessage) {
+        answer(requireContext(), message, adminMessage);
+    }
+
+    private static CommandContext<CommandSourceStack> requireContext() {
+        CommandContext<CommandSourceStack> ctx = CURRENT_CONTEXT.get();
+        if (ctx == null) {
+            throw new IllegalStateException("answer() called outside command execution context");
+        }
+        return ctx;
+    }
 
     /**
      * Sends a message to the command source.
@@ -331,13 +345,13 @@ public abstract class BrigadierCommand {
         List<Predicate<CommandSourceStack>> predicates = new ArrayList<>();
 
         if (command.defaultExecutor != null && command.defaultExecutor.requirement() != null) {
-            predicates.add(command.defaultExecutor.requirement().and(allowedSources(command.defaultExecutor.allowedSources())));
+            predicates.add(command.defaultExecutor.requirement());
         }
 
         command.syntaxTrees.forEach(syntaxTree -> {
 
             if (syntaxTree.requirement() != null) {
-                predicates.add(syntaxTree.requirement().and(allowedSources(syntaxTree.allowedSources())));
+                predicates.add(syntaxTree.requirement());
             }
 
         });

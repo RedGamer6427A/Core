@@ -7,9 +7,8 @@ import java.util.function.Predicate;
 /**
  * This is used for the defaultExecutor
  * @param command The code to be executed
- * @param allowedSources whether it should be Player only
  */
-public record Executor(CommandRunner<CommandSourceStack> command, AllowedSources allowedSources, Predicate<CommandSourceStack> requirement) {
+public record Executor(CommandRunner<CommandSourceStack> command, Predicate<CommandSourceStack> requirement) {
 
 
 

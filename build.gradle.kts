@@ -16,8 +16,11 @@ subprojects {
         dependencies {
             add("compileOnly", "org.projectlombok:lombok:$lombokVersion")
             add("annotationProcessor", "org.projectlombok:lombok:$lombokVersion")
-        }
 
+        }
+        extensions.configure<JavaPluginExtension> {
+            toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+        }
     }
 
 }

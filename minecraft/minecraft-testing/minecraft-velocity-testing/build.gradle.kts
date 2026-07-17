@@ -5,7 +5,7 @@ plugins {
     id("com.gradleup.shadow") version "9.1.0"
 }
 
-group = "dev.redgamer6427a.core.minecraft.paper.testing"
+group = "dev.redgamer6427a.core.minecraft.velocity.testing"
 version = "2.0.0"
 
 repositories {
@@ -20,7 +20,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":minecraft:minecraft-common"))
-    implementation(project(":minecraft:minecraft-paper"))
+    implementation(project(":minecraft:minecraft-velocity"))
 
     compileOnly("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")

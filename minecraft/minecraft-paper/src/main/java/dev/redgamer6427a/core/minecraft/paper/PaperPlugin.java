@@ -1,6 +1,7 @@
 package dev.redgamer6427a.core.minecraft.paper;
 
 import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
+import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.performance.Performance;
 import dev.redgamer6427a.core.minecraft.common.util.AMPIntegration;
@@ -29,6 +30,7 @@ public abstract class PaperPlugin extends JavaPlugin {
         return instance.getComponentLogger();
 
     }
+    private static final Logger logger = Logger.create();
 
     @Override
     public final void onDisable() {
@@ -48,7 +50,7 @@ public abstract class PaperPlugin extends JavaPlugin {
             AdventureMM.mm("initialize colors!"); // hmm yes I'm so good at thread stuff!
 
             if (instance != null) {
-                logger().error(mm("Something went severely wrong. AdmiralPlugin#onEnable:47"));
+                logger.error(mm("Something went severely wrong."));
 
             }
             instance = this;

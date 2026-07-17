@@ -4,8 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.Message;
-import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponses;
-import dev.redgamer6427a.core.messagebus.MessageBusConstants;
+import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponse;
 import dev.redgamer6427a.core.messagebus.MessageBusUtil;
 import lombok.Getter;
 
@@ -23,6 +22,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -108,6 +108,7 @@ public class MessageBusClient {
         heartbeatThread = new Thread(this::heartbeatLoop, "hub-client-heartbeat-" + clientID);
         heartbeatThread.setDaemon(true);
         heartbeatThread.start();
+
     }
 
     private void heartbeatLoop() {
@@ -133,15 +134,15 @@ public class MessageBusClient {
             try {
                 sendFrame(buffer.array());
                 byte res = awaitResponse()[0];
-                if ((int) res != MessageBusBrokerResponses.ALL_GOOD.getCode()){
+                if ((int) res != MessageBusBrokerResponse.ALL_GOOD.getCode()){
 
-                    MessageBusBrokerResponses resE = MessageBusBrokerResponses.fromCode(res);
+                    MessageBusBrokerResponse resE = MessageBusBrokerResponse.fromCode(res);
                     if (resE == null) {
                         logger.error("Heartbeat response is invalid! {}"+res);
                         return;
                     }
-                    logger.warning("Heartbeat response is not ok {}", MessageBusBrokerResponses.fromCode(res));
-                    if (resE == MessageBusBrokerResponses.NOT_AUTHORIZED) {
+                    logger.warning("Heartbeat response is not ok {}", MessageBusBrokerResponse.fromCode(res));
+                    if (resE == MessageBusBrokerResponse.NOT_AUTHORIZED) {
                         logger.error("Client sent an unauthorized heartbeat! Reconnecting...");
                         reconnect();
                     } else {
@@ -217,9 +218,11 @@ public class MessageBusClient {
     public void sendFrame(byte[] payload) throws IOException {
         try {
             synchronized (out) {
+
                 out.writeInt(payload.length);
                 out.write(payload);
                 out.flush();
+                lastHeartbeat = System.currentTimeMillis();
             }
         } catch (SocketException e) {
             logger.warning("Client could not connect to broker. Reconnecting...");
@@ -229,11 +232,13 @@ public class MessageBusClient {
 
     private final AtomicReference<Thread> reconnectThread = new AtomicReference<>();
 
+    private final AtomicInteger waitingTime = new AtomicInteger();
+
     private synchronized void reconnect() {
         if (reconnectThread.get() != null) return;
 
         close(true);
-
+        waitingTime.set(1_000);
         Thread thread = new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -241,12 +246,15 @@ public class MessageBusClient {
                 while (!Thread.currentThread().isInterrupted()) {
                     int res = subscribe();
 
-                    if (res == MessageBusBrokerResponses.ALL_GOOD.getCode()) {
+                    if (res == MessageBusBrokerResponse.ALL_GOOD.getCode()) {
                         logger.info("Reconnected to broker!");
                         break;
                     }
 
-                    Thread.sleep(10_000);
+                    logger.finest("Reconnect failed! Retrying in {}s", waitingTime.get());
+
+                    Thread.sleep(waitingTime.get());
+                    waitingTime.set(Math.min(25_000, (int) Math.floor(waitingTime.get() * 1.2)));
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -291,8 +299,8 @@ public class MessageBusClient {
 
         try {
             if (socket != null) socket.close();
-            readerThread.interrupt();
-            heartbeatThread.interrupt();
+            if (readerThread != null) readerThread.interrupt();
+            if (heartbeatThread != null) heartbeatThread.interrupt();
             if (reconnectThread.get() != null) reconnectThread.get().interrupt();
         } catch (IOException ignored) {
         }
@@ -334,7 +342,7 @@ public class MessageBusClient {
             logger.info("Subscribing to broker as {}...", clientID);
             logger.finest("Subscribe method called");
 
-            if (shouldBeSubscribed) return MessageBusBrokerResponses.ALL_GOOD.getCode();
+            if (shouldBeSubscribed) return MessageBusBrokerResponse.ALL_GOOD.getCode();
             if (!isConnected()) {
                 try {
                     try {
@@ -350,34 +358,34 @@ public class MessageBusClient {
                     return -1;
                 }
             }
-            logger.finest("All checks passed..");
+
             try {
                 ByteBuffer buffer = ByteBuffer.allocate(1 + ID_LENGTH + PASS_LENGTH);
                 buffer.put(TYPE_SUBSCRIBE);
                 buffer.put(MessageBusUtil.toFixedField(clientID, ID_LENGTH));
                 buffer.put(MessageBusUtil.toFixedField(pass, PASS_LENGTH));
-                logger.finest("Sending Frame..");
+                logger.finest("Sending subscribe frame..");
                 sendFrame(buffer.array());
                 logger.finest("Frame sent, awaiting response...");
                 byte[] res = awaitResponse();
                 int resCode = Byte.toUnsignedInt(res[0]);
                 logger.finest("Response code: " + resCode);
-                if (resCode != MessageBusBrokerResponses.ALL_GOOD.getCode()) {
-                    if (resCode == MessageBusBrokerResponses.BAD_PASSWORD.getCode()) {
+                if (resCode != MessageBusBrokerResponse.ALL_GOOD.getCode()) {
+                    if (resCode == MessageBusBrokerResponse.BAD_PASSWORD.getCode()) {
                         logger.critical("Client owns an invalid password. Please check the configuration");
 
                         close(false);
                         return resCode;
-                    } else if (resCode == MessageBusBrokerResponses.ALREADY_AUTHORIZED.getCode()) {
+                    } else if (resCode == MessageBusBrokerResponse.ALREADY_AUTHORIZED.getCode()) {
                         logger.warning("Broker says the client is already authorized. Moving on...");
                         shouldBeSubscribed = true;
-                        return MessageBusBrokerResponses.ALL_GOOD.getCode();
-                    } else if (resCode == MessageBusBrokerResponses.CLIENT_ID_ALREADY_IN_USE.getCode()) {
+                        return MessageBusBrokerResponse.ALL_GOOD.getCode();
+                    } else if (resCode == MessageBusBrokerResponse.CLIENT_ID_ALREADY_IN_USE.getCode()) {
                         logger.critical("Broker says the client's id is already being used (Please check the config). Reconnecting...");
                         reconnect();
                         return resCode;
                     } else {
-                        logger.warning("Got error code " + MessageBusBrokerResponses.fromCode(resCode) + " which makes next to no sense in auth.");
+                        logger.warning("Got error code " + MessageBusBrokerResponse.fromCode(resCode) + " which makes next to no sense in auth.");
                         return resCode;
                     }
                 } else {
@@ -424,7 +432,7 @@ public class MessageBusClient {
             try {
                 if (!shouldBeSubscribed) {
                     int res = subscribe();
-                    if (res != MessageBusBrokerResponses.ALL_GOOD.getCode()) {
+                    if (res != MessageBusBrokerResponse.ALL_GOOD.getCode()) {
                         return res;
                     }
                 }
@@ -444,19 +452,19 @@ public class MessageBusClient {
                 byte[] res = awaitResponse();
                 int resCode = Byte.toUnsignedInt(res[0]);
 
-                if (resCode != MessageBusBrokerResponses.ALL_GOOD.getCode()) {
-                    if (resCode == MessageBusBrokerResponses.NOT_AUTHORIZED.getCode()) {
+                if (resCode != MessageBusBrokerResponse.ALL_GOOD.getCode()) {
+                    if (resCode == MessageBusBrokerResponse.NOT_AUTHORIZED.getCode()) {
                         logger.warning("Broker says the client is not authorized. Retrying...");
                         shouldBeSubscribed = false;
                         return sendMessage(message, retryNum + 1);
-                    } else if (resCode == MessageBusBrokerResponses.FRAME_TOO_LARGE.getCode()) {
+                    } else if (resCode == MessageBusBrokerResponse.FRAME_TOO_LARGE.getCode()) {
                         logger.error("Attempted to send a frame larger than allowed!");
                         return resCode;
-                    } else if (resCode == MessageBusBrokerResponses.MALFORMED_JSON.getCode()) {
+                    } else if (resCode == MessageBusBrokerResponse.MALFORMED_JSON.getCode()) {
                         logger.error("Malformed JSON sent to the broker! Retrying...");
                         return sendMessage(message, retryNum + 1);
                     } else {
-                        logger.warning("Got error code " + MessageBusBrokerResponses.fromCode(resCode) + " which makes next to no sense here.");
+                        logger.warning("Got error code " + MessageBusBrokerResponse.fromCode(resCode) + " which makes next to no sense here.");
                         return resCode;
                     }
                 }

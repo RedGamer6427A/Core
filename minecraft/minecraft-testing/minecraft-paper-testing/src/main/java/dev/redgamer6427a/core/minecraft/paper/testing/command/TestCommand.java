@@ -2,7 +2,6 @@ package dev.redgamer6427a.core.minecraft.paper.testing.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
-import dev.redgamer6427a.core.minecraft.paper.command.AllowedSources;
 import dev.redgamer6427a.core.minecraft.paper.command.BrigadierCommand;
 import dev.redgamer6427a.core.minecraft.paper.command.argument.Argument;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -19,7 +18,7 @@ public class TestCommand extends BrigadierCommand {
             context.getSource().getSender().sendMessage(AdventureMM.serialize(AdventureMM.mm(mini)));
             context.getSource().getSender().sendMessage(GsonComponentSerializer.gson().serialize(AdventureMM.mm(mini)));
 
-        }, AllowedSources.ALL, argument);
+        }, argument);
         addSubCommand(new SubCommand());
     }
 }

@@ -3,10 +3,13 @@ package dev.redgamer6427a.core.minecraft.paper.testing;
 import dev.redgamer6427a.core.logging.Level;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.client.MessageBusClient;
+import dev.redgamer6427a.core.messagebus.packet.Packets;
 import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import dev.redgamer6427a.core.minecraft.paper.testing.command.*;
+import dev.redgamer6427a.core.minecraft.paper.testing.messaging.CommandBroadcastPacket;
 import dev.redgamer6427a.core.minecraft.paper.util.PaperParameters;
+import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -34,7 +37,7 @@ public class PaperTestPlugin extends PaperPlugin {
         Logger.setMinLevel(Level.FINEST);
         Logger.setOut(s -> logger().info(s));
         Logger.setErrOut(s -> logger().error(s));
-
+        Packets.setShouldUnknownError(true);
 
     }
 
@@ -47,11 +50,28 @@ public class PaperTestPlugin extends PaperPlugin {
             client = new MessageBusClient("127.0.0.0", 25581, "ascii-password", clientID);
             client.onMessage(message -> {
                 logger().info(message.toString());
-                MessagingHandler.handle(message);
+                boolean packet = Packets.handle(message);
+                if (!packet) {
+                    try {
+                        MessagingHandler.handle(message);
+                    }   catch (Exception e) {
+                        logger.catching(e);
+                    }
+                }
             });
-
+            Packets.setMessageBusClient(client);
             client.subscribe();
         }
+
+        Packets.addHandler(CommandBroadcastPacket.class, commandBroadcastPacket -> {
+            logger.info("Executing CommandBroadcastPacket: ", commandBroadcastPacket.command());
+
+            Bukkit.getScheduler().callSyncMethod(this, () -> {
+                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), commandBroadcastPacket.command());
+                return null;
+            });
+
+        });
 
     }
 
@@ -62,6 +82,8 @@ public class PaperTestPlugin extends PaperPlugin {
         new GlobalOpCommand().register();
         new GlobalDeopCommand().register();
         new GlobalReloadCommand().register();
+        new GlobalExecute().register();
+        new GlobalProxyExecute().register();
     }
 
     @Override
