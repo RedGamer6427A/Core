@@ -134,6 +134,7 @@ public class MessageBusClient {
                 byte res = awaitResponse()[0];
                 if ((int) res != MessageBusBrokerResponses.ALL_GOOD.getCode()){
                     logger.warning("Heartbeat response is not ok {}", MessageBusBrokerResponses.fromCode(res));
+// TODO: Handle err codes and add reconnect
                 } else {
                     logger.fine("Heartbeat ok!");
                     lastHeartbeat = System.currentTimeMillis();
