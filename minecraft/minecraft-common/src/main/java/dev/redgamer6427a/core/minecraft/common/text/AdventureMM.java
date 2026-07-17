@@ -100,10 +100,8 @@ public class AdventureMM {
                     out.append("<head_texture_hash:").append(hash).append('>');
                 }
             }
-            return;
-        }
-
-        if (component instanceof TextComponent text && !text.content().isEmpty()) {
+            // fall through — do NOT return, children (trailing text) still need processing
+        } else if (component instanceof TextComponent text && !text.content().isEmpty()) {
             out.append(MiniMessage.miniMessage().serialize(Component.text(text.content(), text.style())));
         }
 
@@ -111,7 +109,6 @@ public class AdventureMM {
             serializeNode(child, out);
         }
     }
-
     private static String extractHash(String base64Value) {
         String json = new String(Base64.getDecoder().decode(base64Value), StandardCharsets.UTF_8);
         int idx = json.indexOf("texture/");

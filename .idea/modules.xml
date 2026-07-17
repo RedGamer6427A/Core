@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-common/Core.minecraft.minecraft-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-common/Core.minecraft.minecraft-common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-common/Core.minecraft.minecraft-common.test.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-common/Core.minecraft.minecraft-common.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-paper/Core.minecraft.minecraft-paper.main.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-paper/Core.minecraft.minecraft-paper.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-paper/Core.minecraft.minecraft-paper.test.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-paper/Core.minecraft.minecraft-paper.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-paper-testing/Core.minecraft.minecraft-testing.minecraft-paper-testing.main.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-paper-testing/Core.minecraft.minecraft-testing.minecraft-paper-testing.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-paper-testing/Core.minecraft.minecraft-testing.minecraft-paper-testing.test.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-paper-testing/Core.minecraft.minecraft-testing.minecraft-paper-testing.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-velocity-testing/Core.minecraft.minecraft-testing.minecraft-velocity-testing.main.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-velocity-testing/Core.minecraft.minecraft-testing.minecraft-velocity-testing.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-velocity-testing/Core.minecraft.minecraft-testing.minecraft-velocity-testing.test.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-testing/minecraft-velocity-testing/Core.minecraft.minecraft-testing.minecraft-velocity-testing.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-velocity/Core.minecraft.minecraft-velocity.main.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-velocity/Core.minecraft.minecraft-velocity.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/minecraft/minecraft-velocity/Core.minecraft.minecraft-velocity.test.iml" filepath="$PROJECT_DIR$/.idea/modules/minecraft/minecraft-velocity/Core.minecraft.minecraft-velocity.test.iml" />
+    </modules>
+  </component>
+</project>

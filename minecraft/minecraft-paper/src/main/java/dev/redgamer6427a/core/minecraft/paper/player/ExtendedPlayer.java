@@ -2,6 +2,9 @@ package dev.redgamer6427a.core.minecraft.paper.player;
 
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import lombok.Getter;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -53,5 +56,12 @@ public class ExtendedPlayer {
         throw new IllegalStateException("A module could not be found for " + moduleClass.getName());
     }
 
+    public ServerPlayer getServerPlayer() {
+        return ((CraftPlayer) player).getHandle();
+    }
+
+    public void sendPacket(Packet<?> packet){
+        getServerPlayer().connection.send(packet);
+    }
 
 }

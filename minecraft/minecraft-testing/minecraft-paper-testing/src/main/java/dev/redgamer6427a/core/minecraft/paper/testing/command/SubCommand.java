@@ -1,29 +1,12 @@
 package dev.redgamer6427a.core.minecraft.paper.testing.command;
 
-import ca.spottedleaf.concurrentutil.completable.Completable;
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import dev.redgamer6427a.core.messagebus.Message;
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.paper.command.AllowedSources;
 import dev.redgamer6427a.core.minecraft.paper.command.BrigadierCommand;
-import dev.redgamer6427a.core.minecraft.paper.command.argument.Argument;
-import dev.redgamer6427a.core.minecraft.paper.testing.PaperTestPlugin;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.object.ObjectContents;
-import net.kyori.adventure.text.object.PlayerHeadObjectContents;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
-import net.minecraft.network.protocol.game.ClientboundTickingStatePacket;
-import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.A;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
 
 public class SubCommand extends BrigadierCommand {
 
@@ -34,11 +17,16 @@ public class SubCommand extends BrigadierCommand {
         setDefaultExecutor(context -> {
 
             if (context.getSource().getSender() instanceof Player player) {
-                ServerPlayer sp = ((CraftPlayer) player).getHandle();
 
-                ClientboundEntityEventPacket packet = new ClientboundEntityEventPacket(sp, (byte) 35);
+                String minimessage = "<head_texture_hash:958abf349395285ae0e6647044a36cb4357b98c5d52bb05022785f10ecff1a3f><green>HAI<head_texture_hash:e4ab55bb786d81a64f368282c33637cf6ccb0c4271e1dfc0dafc8b281c1fbbca><head_texture:2012><head_texture:evil>";
+                player.sendMessage(mm("<green>Minimessage: <gray>").append(Component.text(minimessage)));
+                Component component = mm(minimessage);
+                answer(context, mm("<blue>Component: ").append(component));
+                player.sendMessage(mm("<pink>Parsed Minimessage: <gray>").append(Component.text(AdventureMM.serialize(component))));
+                answer(context, "<purple>Parsed Component: <gray>" + AdventureMM.serialize(component));
 
-                sp.connection.send(packet);
+
+
             }
         }, AllowedSources.PLAYER);
     }
