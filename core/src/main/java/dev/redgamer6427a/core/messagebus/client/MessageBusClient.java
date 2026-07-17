@@ -167,10 +167,10 @@ public class MessageBusClient {
                 byte[] frame = readFrame();
                 if (frame == null) continue;
                 if (frame.length == 1) {
-                    logger.finest("Received a response frame from the broker: {}", (Object) frame);
+                    logger.finest("Received a response frame from the broker: {}", (int) (frame[0]));
                     pendingResponse.offer(frame);
                 } else if (frame.length > 0) {
-                    logger.finest("Received a message frame from the broker: {}", (Object) frame);
+                    logger.finest("Received a message frame from the broker: {}", frame);
                     handlePushedMessage(frame);
                 }
             }

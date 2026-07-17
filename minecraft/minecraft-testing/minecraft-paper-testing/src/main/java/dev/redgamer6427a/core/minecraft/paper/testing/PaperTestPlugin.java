@@ -3,6 +3,7 @@ package dev.redgamer6427a.core.minecraft.paper.testing;
 import dev.redgamer6427a.core.logging.Level;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.client.MessageBusClient;
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import dev.redgamer6427a.core.minecraft.paper.testing.command.*;
 import dev.redgamer6427a.core.minecraft.paper.util.PaperParameters;
@@ -39,6 +40,8 @@ public class PaperTestPlugin extends PaperPlugin {
 
     @Override
     public void afterEnable() {
+        AdventureMM.registerHead("2012", "db0c1cd6865a533d22633a3b4e1d4c88b52bf0c669d173c143d2ba4307af9462");
+        AdventureMM.registerHead("evil", "ac2fbe2b06d905710c958cd520ae7c8c6eec1205ed3a32460be24e3ae9b80d41");
         String clientID = Config.getInstance().getChatCategory().clientID.value();
         if (!Objects.equals(clientID, "none")) {
             client = new MessageBusClient("127.0.0.0", 25581, "ascii-password", clientID);

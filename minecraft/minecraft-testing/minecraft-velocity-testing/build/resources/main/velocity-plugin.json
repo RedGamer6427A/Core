@@ -1,6 +1,0 @@
-{
-  "id": "minecraft-velocity-testing",
-  "name": "minecraft-velocity-testing",
-  "version": "${version}",
-  "main": "dev.redgamer6427a.core.minecraft.velocity.testing.VelocityTest"
-}
