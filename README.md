@@ -24,7 +24,7 @@ implementation("dev.redgamer6427a.core.minecraft.common:minecraft-common:2.0.0")
 implementation("dev.redgamer6427a.core.minecraft.velocity:minecraft-velocity:2.0.0")
 ```
 
-Java 25!
+Java 25!<br>
 Have some contractually mandated fun! fun! fun!
 
 ## Known issues
