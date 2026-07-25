@@ -28,5 +28,5 @@ Java 25!
 Have some contractually mandated fun! fun! fun!
 
 ## Known issues
-Two plugins can't use the lib at once.
-It's bad code.
+- Two proxy plugins can't use the lib at once.
+- It's bad code.
