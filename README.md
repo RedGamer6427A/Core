@@ -5,7 +5,7 @@ For the testing, create a plugin-dirs.txt file in the testing module you want to
 
 ## Usage
 Shadow it into your plugin using these
-(yes i do know github packages exist, deal with it)
+(yes i do know github packages exist, deal with it)<br><br>
 settings.gradle.kts
 ```kotlin
 includeBuild("/path/to/your/version/of/this/monster")
