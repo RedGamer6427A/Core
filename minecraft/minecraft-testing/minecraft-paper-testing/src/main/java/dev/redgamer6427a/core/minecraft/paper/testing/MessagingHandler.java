@@ -2,6 +2,7 @@ package dev.redgamer6427a.core.minecraft.paper.testing;
 
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.Message;
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
@@ -11,7 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Map;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 
 public class MessagingHandler {
 private static final Logger logger = Logger.create();
@@ -22,7 +23,7 @@ private static final Logger logger = Logger.create();
 
         if (data.get("eventType").equals("globalchat")) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendMessage(mm("<dark_gray>[<gray>"+message.sender()+"<dark_gray>] <white>"+data.get("sender")+ "<gray>: <white>").append(Component.text(data.get("content")).style(Style.style(TextColor.color(255,255,255)))));
+                player.sendMessage(AdventureMM.cc("<dark_gray>[<gray>"+message.sender()+"<dark_gray>] <white>"+data.get("sender")+ "<gray>: <white>").append(Component.text(data.get("content")).style(Style.style(TextColor.color(255,255,255)))));
             }
         }
         if (data.get("eventType").equals("global-op")) {
@@ -44,7 +45,7 @@ private static final Logger logger = Logger.create();
             logger.info(subject.getName() + " has been unmade an operator on the whole network by "+data.get("sender")+" on "+message.sender()+"!");
         }
         if (data.get("eventType").equals("reload-all")) {
-            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(mm("<blue>Global Reload...")));
+            Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(AdventureMM.cc("<blue>Global Reload...")));
             logger.info("Global reload!");
             Bukkit.getScheduler().callSyncMethod(PaperTestPlugin.getInstance(), () -> {Bukkit.getServer().reload();return null;});
         }

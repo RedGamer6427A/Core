@@ -37,35 +37,25 @@ tasks.processResources {
     }
 }
 
-val pluginsDir1 = "/home/red/Servers/Minecraft/Core Testing/Node 1/plugins"
-val pluginsDir2 = "/home/red/Servers/Minecraft/Core Testing/Node 2/plugins"
-val pluginsDir3 = "/home/red/Servers/Minecraft/Core Testing/Node 3/plugins"
-
-
-
-tasks.register<Copy>("copyJar") {
-    dependsOn(tasks.shadowJar)
-
-    from(tasks.shadowJar.flatMap { it.archiveFile })
-    into(layout.projectDirectory.dir("out/jars"))
+val pluginDirsFile = file("plugin-dirs.txt") // newline-separated folder list
+val pluginJarName: String by lazy {
+    (findProperty("pluginJarName") as String?) ?: project.name
 }
 
 tasks.shadowJar {
     archiveClassifier.set("")
-    dependsOn ("processResources")
+    archiveBaseName.set(pluginJarName)
+    dependsOn("processResources")
     doLast {
-        copy {
-            from(archiveFile)
-            into(file(pluginsDir1))
-        }
-        copy {
-            from(archiveFile)
-            into(file(pluginsDir2))
-        }
-        copy {
-            from(archiveFile)
-            into(file(pluginsDir3))
-        }
+        val jar = archiveFile.get().asFile
+        pluginDirsFile.readLines()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .forEach { dir ->
+                copy {
+                    from(jar)
+                    into(file(dir))
+                }
+            }
     }
 }
-

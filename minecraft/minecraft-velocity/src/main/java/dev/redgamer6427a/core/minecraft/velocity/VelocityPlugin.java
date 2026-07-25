@@ -48,8 +48,6 @@ public abstract class VelocityPlugin {
     private static final Logger logger = Logger.create();
 
 
-
-
     public VelocityPlugin(ProxyServer proxyServer, java.util.logging.Logger javaLogger, ComponentLogger componentLogger, @DataDirectory Path dataDirectory, PluginDescription pluginDescription, PluginContainer pluginContainer, ExecutorService executorService) {
         Logger.setOut(javaLogger::info);
         Logger.setErrOut(javaLogger::severe);
@@ -81,7 +79,7 @@ public abstract class VelocityPlugin {
     public final void onEnable(ProxyInitializeEvent event) {
         long m = Performance.measure(() -> {
 
-            AdventureMM.mm("initialize colors!"); // hmm yes I'm so good at thread stuff!
+            AdventureMM.cc("initialize colors!"); // hmm yes I'm so good at thread stuff!
 
 
 
@@ -92,7 +90,7 @@ public abstract class VelocityPlugin {
             defineConfigurations();
 
             EventDefiner eventDefiner = new EventDefiner();
-            eventDefiner.define(this);
+
             defineEvents(eventDefiner);
 
             defineCommands();

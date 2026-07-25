@@ -1,5 +1,6 @@
 package dev.redgamer6427a.core.minecraft.paper.menu;
 
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import dev.redgamer6427a.core.minecraft.paper.item.ExtendedItemStack;
 import net.kyori.adventure.sound.Sound;
@@ -16,7 +17,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 import static org.bukkit.Material.BARRIER;
 
 public class ClickableItemStack extends ItemStack {
@@ -79,7 +80,7 @@ public class ClickableItemStack extends ItemStack {
     }
 
     public static ClickableItemStack closeItem(){
-        return new ClickableItemStack(new ExtendedItemStack(BARRIER).itemName(mm("<red>Close")).get(), inventoryClickEvent -> {
+        return new ClickableItemStack(new ExtendedItemStack(BARRIER).itemName(AdventureMM.cc("<red>Close")).get(), inventoryClickEvent -> {
             inventoryClickEvent.setCancelled(true);
             inventoryClickEvent.setResult(Event.Result.DENY);
             inventoryClickEvent.getClickedInventory().close();
@@ -87,7 +88,7 @@ public class ClickableItemStack extends ItemStack {
     }
 
     public static ClickableItemStack closeItem(Sound sound){
-        return new ClickableItemStack(new ExtendedItemStack(BARRIER).itemName(mm("<red>Close")).get(), inventoryClickEvent -> {
+        return new ClickableItemStack(new ExtendedItemStack(BARRIER).itemName(AdventureMM.cc("<red>Close")).get(), inventoryClickEvent -> {
             inventoryClickEvent.setCancelled(true);
             inventoryClickEvent.setResult(Event.Result.DENY);
             inventoryClickEvent.getClickedInventory().close();

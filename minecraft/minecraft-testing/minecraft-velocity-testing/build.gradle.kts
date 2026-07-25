@@ -26,23 +26,25 @@ dependencies {
     annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
 }
 
-val pluginsDir = "/home/red/Servers/Minecraft/Core Testing/Proxy/plugins"
-
-tasks.register<Copy>("copyJar") {
-    dependsOn(tasks.shadowJar)
-
-    from(tasks.shadowJar.flatMap { it.archiveFile })
-    into(layout.projectDirectory.dir("out/jars"))
+val pluginDirsFile = file("plugin-dirs.txt") // newline-separated folder list
+val pluginJarName: String by lazy {
+    (findProperty("pluginJarName") as String?) ?: project.name
 }
 
 tasks.shadowJar {
     archiveClassifier.set("")
-    dependsOn ("processResources")
+    archiveBaseName.set(pluginJarName)
+    dependsOn("processResources")
     doLast {
-        copy {
-            from(archiveFile)
-            into(file(pluginsDir))
-        }
+        val jar = archiveFile.get().asFile
+        pluginDirsFile.readLines()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .forEach { dir ->
+                copy {
+                    from(jar)
+                    into(file(dir))
+                }
+            }
     }
 }
-

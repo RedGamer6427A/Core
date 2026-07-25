@@ -9,12 +9,14 @@ import dev.redgamer6427a.core.minecraft.paper.PaperPlugin;
 import dev.redgamer6427a.core.minecraft.paper.protocol.PacketInterceptor;
 import dev.redgamer6427a.core.minecraft.paper.testing.command.*;
 import dev.redgamer6427a.core.minecraft.paper.testing.messaging.CommandBroadcastPacket;
+import dev.redgamer6427a.core.minecraft.paper.testing.messaging.GlobalMSGPacket;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import org.bukkit.Bukkit;
 
 import java.util.Objects;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 
 public class PaperTestPlugin extends PaperPlugin {
 
@@ -55,7 +57,7 @@ public class PaperTestPlugin extends PaperPlugin {
                     }
                 }
             });
-            Packets.setMessageBusClient(client);
+            Packets.setMessageBusInterface(client);
             client.subscribe();
         }
 
@@ -69,11 +71,19 @@ public class PaperTestPlugin extends PaperPlugin {
 
         });
 
+        Packets.addHandler(GlobalMSGPacket.class, globalMsgPacket -> {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                player.sendMessage(cc(globalMsgPacket.message()));
+
+            });
+            logger.info(mm(globalMsgPacket.message()));
+        });
+
         PacketInterceptor.addHandler(ServerboundChatPacket.class, (packet, context) -> {
             if (packet.message().contains("cancel")){
                 Bukkit.getScheduler().callSyncMethod(this, () -> {
 
-                    context.getPlayer().getPlayer().kick(mm("<red>That message was <dark_red>WAY <red>too funny! Cancelling..."));
+                    context.getPlayer().getPlayer().kick(cc("<red>That message was <dark_red>WAY <red>too funny! Cancelling..."));
                     return null;
                 });
                 context.setCancelled(true);

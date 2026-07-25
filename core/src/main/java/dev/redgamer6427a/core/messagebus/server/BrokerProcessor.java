@@ -1,14 +1,14 @@
 package dev.redgamer6427a.core.messagebus.server;
 
 import dev.redgamer6427a.core.messagebus.Message;
+import dev.redgamer6427a.core.messagebus.MessageBusInterface;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
-public class BrokerProcessor {
+public class BrokerProcessor implements MessageBusInterface {
     
     @Getter
     @Setter
@@ -21,10 +21,6 @@ public class BrokerProcessor {
     @Getter
     private BiConsumer<Message, ClientConnection> sender;
 
-    public void dispatch(Message message) {
-        sender.accept(message, null);
-    }
-
     /**
      *
      * @param brokerThread the BrokerThread to attach to
@@ -35,5 +31,10 @@ public class BrokerProcessor {
         this.sender = brokerThread::dispatch;
         this.consumer = consumer;
     }
-    
+
+    @Override
+    public int sendMessage(Message message) {
+        sender.accept(message, null);
+        return 0;
+    }
 }

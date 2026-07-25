@@ -10,7 +10,8 @@ import com.velocitypowered.api.proxy.ConsoleCommandSource;
 
 
 import com.velocitypowered.api.proxy.Player;
-import dev.redgamer6427a.core.minecraft.common.text.TerminalStyle;
+import dev.redgamer6427a.core.console.output.ANSICode;
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.velocity.VelocityPlugin;
 import dev.redgamer6427a.core.minecraft.velocity.command.argument.Argument;
 
@@ -19,7 +20,7 @@ import net.kyori.adventure.text.Component;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mmToConsole;
 
 
@@ -216,7 +217,7 @@ public abstract class BrigadierCommand {
     public static void answer(CommandContext<CommandSource> context, Component message) {
         CommandSource source = context.getSource();
         if (source instanceof ConsoleCommandSource) {
-            source.sendMessage(mm(mmToConsole(message) + TerminalStyle.RESET));
+            source.sendMessage(AdventureMM.cc(mmToConsole(message) + ANSICode.RESET.format()));
         } else {
             source.sendMessage(message);
         }
@@ -231,9 +232,9 @@ public abstract class BrigadierCommand {
     public static void answer(CommandContext<CommandSource> context, String message) {
         CommandSource source = context.getSource();
         if (source instanceof ConsoleCommandSource) {
-            source.sendMessage(mm(message + TerminalStyle.RESET));
+            source.sendMessage(AdventureMM.cc(message + ANSICode.RESET.format()));
         } else {
-            source.sendMessage(mm(message));
+            source.sendMessage(AdventureMM.cc(message));
         }
     }
 
@@ -249,14 +250,14 @@ public abstract class BrigadierCommand {
 
         if(context.getSource().hasPermission(VelocityPlugin.getInstance().getVerboseAnswerPermission())){
             if (source instanceof ConsoleCommandSource) {
-                source.sendMessage(mm(mmToConsole(adminMessage) + TerminalStyle.RESET));
+                source.sendMessage(AdventureMM.cc(mmToConsole(adminMessage) + ANSICode.RESET.format()));
             } else {
                 source.sendMessage(adminMessage);
             }
 
         } else {
             if (source instanceof ConsoleCommandSource) {
-                source.sendMessage(mm(mmToConsole(message) + TerminalStyle.RESET));
+                source.sendMessage(AdventureMM.cc(mmToConsole(message) + ANSICode.RESET.format()));
             } else {
                 source.sendMessage(message);
             }
@@ -274,7 +275,7 @@ public abstract class BrigadierCommand {
      *
      */
     public static void answer(CommandContext<CommandSource> context, String message, String adminMessage) {
-        answer(context, mm(message), mm(adminMessage));
+        answer(context, AdventureMM.cc(message), AdventureMM.cc(adminMessage));
     }
 
     public static String executor(CommandSource source, boolean capsFirst){

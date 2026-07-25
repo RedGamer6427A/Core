@@ -3,6 +3,7 @@ package dev.redgamer6427a.core.minecraft.common.text;
 
 import dev.redgamer6427a.core.console.output.ConsoleMiniMessage;
 import dev.redgamer6427a.core.logging.Logger;
+import dev.redgamer6427a.core.processing.Parameterize;
 import dev.redgamer6427a.core.processing.mm.MiniMessageParser;
 import dev.redgamer6427a.core.processing.mm.MiniMessageTagProcessor;
 import net.kyori.adventure.text.Component;
@@ -133,8 +134,8 @@ public class AdventureMM {
                     .build())
             .build();
 
-    public static Component mm(String mm, MiniMessageParser parser) {
-        String parsed = parser.parse(mm);
+    public static Component cc(String mm, MiniMessageParser parser, String... params) {
+        String parsed = parser.parse(Parameterize.parameterize(mm, false, false, (Object) params));
 
         return MINI_MESSAGE.deserialize(parsed);
     }
@@ -322,8 +323,8 @@ public class AdventureMM {
         return String.format("#%06x", rgb);
     }
 
-    public static Component mm(String mm) {
-        return mm(mm, parser);
+    public static Component cc(String mm, String... params) {
+        return cc(mm, parser, params);
     }
 
     public static String serializedMM(String mm) {

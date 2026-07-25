@@ -6,7 +6,7 @@ import dev.redgamer6427a.core.minecraft.velocity.configuration.ConfigurationValu
 
 import net.kyori.adventure.text.Component;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 
 
 public class ComponentCV extends ConfigurationValue<Component> {
@@ -25,7 +25,7 @@ public class ComponentCV extends ConfigurationValue<Component> {
         if(o instanceof Component){
             return (Component) o;
         } else if(o instanceof String s){
-            return mm(s);
+            return AdventureMM.cc(s);
         } else {
             return null;
         }

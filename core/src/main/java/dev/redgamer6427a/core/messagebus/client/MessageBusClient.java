@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.Message;
 import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponse;
+import dev.redgamer6427a.core.messagebus.MessageBusInterface;
 import dev.redgamer6427a.core.messagebus.MessageBusUtil;
 import lombok.Getter;
 
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 import static dev.redgamer6427a.core.messagebus.MessageBusConstants.*;
 
-public class MessageBusClient {
+public class MessageBusClient implements MessageBusInterface {
 
     private final String host;
     private final int port;
@@ -328,6 +329,7 @@ public class MessageBusClient {
      * @param message
      * @return
      */
+    @Override
     public int sendMessage(Message message) {
         return sendMessage(message, 0);
     }

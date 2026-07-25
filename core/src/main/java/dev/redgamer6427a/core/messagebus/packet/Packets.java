@@ -3,7 +3,7 @@ package dev.redgamer6427a.core.messagebus.packet;
 import com.google.gson.Gson;
 import dev.redgamer6427a.core.logging.Logger;
 import dev.redgamer6427a.core.messagebus.Message;
-import dev.redgamer6427a.core.messagebus.client.MessageBusClient;
+import dev.redgamer6427a.core.messagebus.MessageBusInterface;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +22,7 @@ public class Packets {
      */
     @Getter
     @Setter
-    private static MessageBusClient messageBusClient;
+    private static MessageBusInterface messageBusInterface;
 
     @Getter
     @Setter

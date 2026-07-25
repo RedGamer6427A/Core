@@ -3,7 +3,7 @@ package dev.redgamer6427a.core.messagebus.packet;
 import com.google.gson.Gson;
 import dev.redgamer6427a.core.messagebus.Message;
 import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponse;
-import dev.redgamer6427a.core.messagebus.client.MessageBusClient;
+import dev.redgamer6427a.core.messagebus.MessageBusInterface;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.RecordComponent;
@@ -47,13 +47,13 @@ public interface Packet {
     /**
      * Async btw
      * @param destination
-     * @param client
+     * @param messageBusInterface
      * @return
      */
-    default CompletableFuture<MessageBusBrokerResponse> send(String destination, boolean urgent, MessageBusClient client) {
+    default CompletableFuture<MessageBusBrokerResponse> send(String destination, boolean urgent, MessageBusInterface messageBusInterface) {
         Message message = asMessage(destination, urgent);
 
-        CompletableFuture<Integer> intFuture = client.sendMessageAsync(message);
+        CompletableFuture<Integer> intFuture = CompletableFuture.supplyAsync(() -> messageBusInterface.sendMessage(message));
         CompletableFuture<MessageBusBrokerResponse> future = new CompletableFuture<>();
         intFuture.thenAccept(integer -> {
             MessageBusBrokerResponse messageBusBrokerResponse = MessageBusBrokerResponse.fromCode(integer);
@@ -65,23 +65,23 @@ public interface Packet {
     }
 
     /**
-     * Only use this if you've set the messageBusClient value in SerializablePackets. WILL FAIL OTHERWISE
+     * Only use this if you've set the messageBusInterface value in SerializablePackets. WILL FAIL OTHERWISE
      * @param destination
      * @return
      */
     default CompletableFuture<MessageBusBrokerResponse> send(String destination, boolean urgent) {
 
-        MessageBusClient messageBusClient = Packets.getMessageBusClient();
-        if (messageBusClient == null) {
-            throw new NullPointerException("MessageBusClient is null! Please set the value in "+ Packets.class.getSimpleName()+"*!");
+        MessageBusInterface messageBusInterface = Packets.getMessageBusInterface();
+        if (messageBusInterface == null) {
+            throw new NullPointerException("MessageBusInterface is null! Please set the value in "+ Packets.class.getSimpleName()+"*!");
         }
-        return send(destination, urgent, messageBusClient);
+        return send(destination, urgent, messageBusInterface);
 
     }
 
     default CompletableFuture<MessageBusBrokerResponse> send() {
 
-        MessageBusClient messageBusClient = Packets.getMessageBusClient();
+        MessageBusInterface messageBusInterface = Packets.getMessageBusInterface();
 
         Boolean urgent = defaultUrgent();
         String destination = defaultDestination();

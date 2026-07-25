@@ -48,7 +48,7 @@ public abstract class PaperPlugin extends JavaPlugin {
     public final void onEnable() {
         long m = Performance.measure(() -> {
 
-            AdventureMM.mm("initialize colors!"); // hmm yes I'm so good at thread stuff!
+            AdventureMM.cc("initialize colors!"); // hmm yes I'm so good at thread stuff!
 
             if (instance != null) {
                 logger.error(mm("Something went severely wrong."));

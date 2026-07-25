@@ -14,9 +14,9 @@ public class TestCommand extends BrigadierCommand {
 
         addSyntax(context -> {
             String mini = context.getArgument("minimessage", String.class);
-            answer(context, AdventureMM.mm(mini));
-            context.getSource().getSender().sendMessage(AdventureMM.serialize(AdventureMM.mm(mini)));
-            context.getSource().getSender().sendMessage(GsonComponentSerializer.gson().serialize(AdventureMM.mm(mini)));
+            answer(context, AdventureMM.cc(mini));
+            context.getSource().getSender().sendMessage(AdventureMM.serialize(AdventureMM.cc(mini)));
+            context.getSource().getSender().sendMessage(GsonComponentSerializer.gson().serialize(AdventureMM.cc(mini)));
 
         }, argument);
         addSubCommand(new SubCommand());

@@ -1,5 +1,6 @@
 package dev.redgamer6427a.core.minecraft.paper.menu;
 
+import dev.redgamer6427a.core.minecraft.common.text.AdventureMM;
 import dev.redgamer6427a.core.minecraft.paper.item.ExtendedItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,7 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 
 
 public abstract class Menu implements InventoryHolder {
@@ -80,7 +81,7 @@ public abstract class Menu implements InventoryHolder {
     }
 
     public static ItemStack filler(){
-        return new ExtendedItemStack(Material.BLACK_STAINED_GLASS_PANE).itemName(mm("")).hideToolTip().get();
+        return new ExtendedItemStack(Material.BLACK_STAINED_GLASS_PANE).itemName(AdventureMM.cc("")).hideToolTip().get();
     }
 
 }
