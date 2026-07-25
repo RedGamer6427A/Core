@@ -1,9 +1,9 @@
 Don't use this code... it's not very good...
 
-# Compiling
+## Compiling
 For the testing, create a plugin-dirs.txt file in the testing module you want to compile.
 
-# Usage
+## Usage
 Shadow it into your plugin using these
 (yes i do know github packages exist, deal with it)
 settings.gradle.kts
@@ -27,6 +27,6 @@ implementation("dev.redgamer6427a.core.minecraft.velocity:minecraft-velocity:2.0
 Java 25!
 Have some contractually mandated fun! fun! fun!
 
-# Known issues
+## Known issues
 Two plugins can't use the lib at once.
 It's bad code.
