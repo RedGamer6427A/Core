@@ -25,9 +25,6 @@ import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 
 public class VelocityTest extends VelocityPlugin {
 
-u
-    ;
-
     private static final Logger logger = Logger.create();
 
     BrokerProcessor brokerProcessor;
