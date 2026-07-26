@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("maven-publish")
 }
 
 group = "dev.redgamer6427a.core"
@@ -23,4 +24,12 @@ dependencies {
 
     implementation("org.bouncycastle:bcpkix-jdk18on:1.78")
     implementation("org.bouncycastle:bcprov-jdk18on:1.78")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }

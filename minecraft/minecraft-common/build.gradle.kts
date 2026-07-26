@@ -1,5 +1,7 @@
 plugins {
     id("java")
+    id("maven-publish")
+
 }
 
 group = "dev.redgamer6427a.core.minecraft.common"

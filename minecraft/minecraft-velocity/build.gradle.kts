@@ -3,6 +3,8 @@ import java.net.URI
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.1.0"
+    id("maven-publish")
+
 }
 
 group = "dev.redgamer6427a.core.minecraft.velocity"
@@ -22,4 +24,12 @@ dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
     implementation("dev.dejvokep:boosted-yaml:1.3.6")
     annotationProcessor("com.velocitypowered:velocity-api:3.5.0-SNAPSHOT")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }

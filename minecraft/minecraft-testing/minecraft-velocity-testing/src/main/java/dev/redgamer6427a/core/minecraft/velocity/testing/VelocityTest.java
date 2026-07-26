@@ -25,10 +25,7 @@ import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 
 public class VelocityTest extends VelocityPlugin {
 
-    public static VelocityTest getInstance() {
-        return (VelocityTest) VelocityPlugin.getInstance();
-    }
-
+u
     ;
 
     private static final Logger logger = Logger.create();
