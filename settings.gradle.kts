@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 include("minecraft:minecraft-common")
 include("minecraft:minecraft-paper")
 include("core")
