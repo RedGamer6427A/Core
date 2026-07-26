@@ -6,12 +6,16 @@ For the testing, create a plugin-dirs.txt file in the testing module you want to
 ## Usage
 Shadow it into your plugin using these
 (yes i do know github packages exist, deal with it)<br><br>
-settings.gradle.kts
-```kotlin
-includeBuild("/path/to/your/version/of/this/monster")
-```
+
 build.gradle.kts (paper/backend)
 ```kotlin
+maven {
+        name = "jitpack"
+        url = uri("https://jitpack.io")
+    }
+
+and
+
 implementation("dev.redgamer6427a.core:core:2.0.0")
 implementation("dev.redgamer6427a.core.minecraft.common:minecraft-common:2.0.0")
 implementation("dev.redgamer6427a.core.minecraft.paper:minecraft-paper:2.0.0")
@@ -19,6 +23,13 @@ implementation("dev.redgamer6427a.core.minecraft.paper:minecraft-paper:2.0.0")
 
 build.gradle.kts (velocity/proxy)
 ```kotlin
+maven {
+        name = "jitpack"
+        url = uri("https://jitpack.io")
+    }
+
+and
+
 implementation("dev.redgamer6427a.core:core:2.0.0")
 implementation("dev.redgamer6427a.core.minecraft.common:minecraft-common:2.0.0")
 implementation("dev.redgamer6427a.core.minecraft.velocity:minecraft-velocity:2.0.0")
