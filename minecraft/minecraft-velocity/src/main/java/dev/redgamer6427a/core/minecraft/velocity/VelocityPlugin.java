@@ -20,7 +20,7 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
-import static dev.redgamer6427a.core.console.output.ConsoleMiniMessage.mm;
+import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 
 @Slf4j
 public abstract class VelocityPlugin {
@@ -49,8 +49,8 @@ public abstract class VelocityPlugin {
 
 
     public VelocityPlugin(ProxyServer proxyServer, java.util.logging.Logger javaLogger, ComponentLogger componentLogger, @DataDirectory Path dataDirectory, PluginDescription pluginDescription, PluginContainer pluginContainer, ExecutorService executorService) {
-        Logger.setOut(javaLogger::info);
-        Logger.setErrOut(javaLogger::severe);
+        Logger.setOut(s -> componentLogger.info(cc(s)));
+        Logger.setOut(s -> componentLogger.error(cc(s)));
 
         if (instance != null) {
             logger.error("Something went severely wrong.");
@@ -71,7 +71,7 @@ public abstract class VelocityPlugin {
     @Subscribe
     public final void onDisable(ProxyShutdownEvent event) {
         long m = Performance.measure(this::disable);
-        componentLogger.info(mm("Shut down. (" + m + "ms)"));
+        logger.info("Shut down. (" + m + "ms)");
         instance = null;
     }
 
@@ -79,7 +79,7 @@ public abstract class VelocityPlugin {
     public final void onEnable(ProxyInitializeEvent event) {
         long m = Performance.measure(() -> {
 
-            AdventureMM.cc("initialize colors!"); // hmm yes I'm so good at thread stuff!
+            cc("initialize colors!"); // hmm yes I'm so good at thread stuff!
 
 
 
