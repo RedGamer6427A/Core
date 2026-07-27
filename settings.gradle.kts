@@ -1,3 +1,5 @@
+rootProject.name = "Core"
+
 pluginManagement {
     repositories {
         gradlePluginPortal()

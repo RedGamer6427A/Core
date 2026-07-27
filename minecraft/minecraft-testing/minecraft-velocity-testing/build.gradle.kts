@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "dev.redgamer6427a.core.minecraft.velocity.testing"
-version = "2.0.0"
+
 
 repositories {
     mavenCentral()

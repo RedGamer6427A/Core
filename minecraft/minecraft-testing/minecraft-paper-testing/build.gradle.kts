@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "dev.redgamer6427a.core.minecraft.paper.testing"
-version = "2.0.0"
+
 
 repositories {
     mavenCentral()

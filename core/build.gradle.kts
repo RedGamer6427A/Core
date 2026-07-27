@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.redgamer6427a.core"
-version = "2.0.0"
+
 
 repositories {
     mavenCentral()

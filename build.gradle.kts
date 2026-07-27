@@ -24,3 +24,7 @@ subprojects {
     }
 
 }
+
+allprojects {
+    version = project.property("projectVersion") as String
+}
