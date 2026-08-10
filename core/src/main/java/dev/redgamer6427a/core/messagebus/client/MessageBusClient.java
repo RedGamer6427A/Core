@@ -79,7 +79,7 @@ public class MessageBusClient implements MessageBusInterface {
     }
 
     public void connect() throws IOException, GeneralSecurityException {
-        logger.info("Connecting to broker...");
+        logger.fine("Connecting to broker...");
         SSLContext ctx = SSLContext.getInstance("TLS");
         TrustManager trustAll = new X509TrustManager() {
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
@@ -248,7 +248,7 @@ public class MessageBusClient implements MessageBusInterface {
                     int res = subscribe();
 
                     if (res == MessageBusBrokerResponse.ALL_GOOD.getCode()) {
-                        logger.info("Reconnected to broker!");
+                        logger.fine("Reconnected to broker!");
                         break;
                     }
 
@@ -295,8 +295,8 @@ public class MessageBusClient implements MessageBusInterface {
     }
 
     public void close(boolean isReconnect) {
-        shouldBeSubscribed = false; // fixed: was `true`, backwards
-        if (!isReconnect) logger.info("Closing client...");
+        shouldBeSubscribed = false;
+        if (!isReconnect) logger.fine("Closing client...");
 
         try {
             if (socket != null) socket.close();
@@ -341,7 +341,7 @@ public class MessageBusClient implements MessageBusInterface {
      */
     public int subscribe() {
         synchronized (sendLock) {
-            logger.info("Subscribing to broker as {}...", clientID);
+            logger.fine("Subscribing to broker as {}...", clientID);
             logger.finest("Subscribe method called");
 
             if (shouldBeSubscribed) return MessageBusBrokerResponse.ALL_GOOD.getCode();
@@ -351,6 +351,7 @@ public class MessageBusClient implements MessageBusInterface {
                         connect();
                     } catch (SocketException e) {
                         logger.warning("An error occurred while trying to subscribe! Reconnecting...");
+                        logger.catching(e);
                         reconnect();
                         return -1;
                     }
@@ -379,7 +380,7 @@ public class MessageBusClient implements MessageBusInterface {
                         close(false);
                         return resCode;
                     } else if (resCode == MessageBusBrokerResponse.ALREADY_AUTHORIZED.getCode()) {
-                        logger.warning("Broker says the client is already authorized. Moving on...");
+                        logger.fine("Broker says the client is already authorized. Moving on...");
                         shouldBeSubscribed = true;
                         return MessageBusBrokerResponse.ALL_GOOD.getCode();
                     } else if (resCode == MessageBusBrokerResponse.CLIENT_ID_ALREADY_IN_USE.getCode()) {
@@ -391,7 +392,7 @@ public class MessageBusClient implements MessageBusInterface {
                         return resCode;
                     }
                 } else {
-                    logger.info("Successfully subscribed to broker!");
+                    logger.fine("Successfully subscribed to broker!");
                     shouldBeSubscribed = true;
                     return resCode;
                 }

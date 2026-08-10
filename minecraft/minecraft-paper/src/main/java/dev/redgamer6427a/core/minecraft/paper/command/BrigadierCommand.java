@@ -23,7 +23,6 @@ import org.bukkit.permissions.Permission;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.cc;
 import static dev.redgamer6427a.core.minecraft.common.text.AdventureMM.mmToConsole;
 
 
