@@ -1,7 +1,6 @@
 package dev.redgamer6427a.core.commands;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public abstract class ArgumentNode<T> extends CommandNode {
@@ -12,12 +11,6 @@ public abstract class ArgumentNode<T> extends CommandNode {
     private final String name;
 
     /**
-     * The argument's parent's depth. Do not edit this.
-     */
-    @Setter
-    private int depth = -1;
-
-    /**
      * Constructor
      * @param parent the parent. Should be null.
      * @param name the argument's name.
@@ -25,14 +18,6 @@ public abstract class ArgumentNode<T> extends CommandNode {
     protected ArgumentNode(LiteralCommandNode parent, String name) {
         super(parent, null);
         this.name = name;
-    }
-
-    /**
-     * Set the argument's executor. Executed if this is the last provided argument.
-     * @param executor the new executor
-     */
-    void setExecutor(CommandExecutor executor) {
-        this.executor = executor;
     }
 
     /**
@@ -51,5 +36,15 @@ public abstract class ArgumentNode<T> extends CommandNode {
         }
 
         return name.equals(((ArgumentNode<?>) obj).name);
+    }
+
+    // BUG FIX (framework): equals() was overridden by name but hashCode() was not,
+    // violating the equals/hashCode contract. Harmless by luck while depth/executor
+    // lived on the node (same instance always used, so identity hashCode still worked
+    // for the ExecutionContext#values map), but a landmine for any future HashMap/HashSet
+    // usage keyed by ArgumentNode. Fixed to match equals().
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

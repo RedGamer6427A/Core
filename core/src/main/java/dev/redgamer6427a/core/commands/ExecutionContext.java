@@ -26,18 +26,18 @@ public class ExecutionContext {
     /**
      * Used during parsing to figure out the next steps.
      *
-     * @param argument the argument to be parsed.
+     * @param binding the argument binding to be parsed (carries its own registration-specific depth).
      * @param <T>      the shared type between the ArgumentNode and ParseResult
      * @return the typed ParseResult.
      * @throws CommandSyntaxException when anything syntax-related goes wrong
      */
-    <T> ParseResult<T> parse(ArgumentNode<T> argument) throws CommandSyntaxException {
+    <T> ParseResult<T> parse(ArgumentBinding<T> binding) throws CommandSyntaxException {
 
         ArgumentReader reader = new ArgumentReader(args,
-                argument.getDepth() + ownDepth);
+                binding.getDepth() + ownDepth);
 
-        ParseResult<T> result = argument.parse(reader);
-        values.put(argument, result.resultData());
+        ParseResult<T> result = binding.getNode().parse(reader);
+        values.put(binding.getNode(), result.resultData());
         ownDepth += result.generatedOffset();
 
         return result;
@@ -56,7 +56,18 @@ public class ExecutionContext {
         if (values.containsKey(argument)) {
             return (T) values.get(argument);
         }
-        return parse(argument).resultData();
+        // BUG FIX (framework): previously fell back to parse(argument), which relied on
+        // depth living on the node itself. That's exactly what turned a "wrong executor
+        // fired" bug into an ArrayIndexOutOfBoundsException/CommandSyntaxException crash —
+        // an argument from an unrelated syntax path (e.g. quickstart's projectArgument
+        // reached from start's executor) got parsed with meaningless depth math. Now that
+        // depth only exists on ArgumentBinding (per-registration), there's no safe way to
+        // parse an argument here without knowing which binding it belongs to. Fail loudly
+        // and clearly instead of silently corrupting the read position.
+        throw new IllegalStateException(
+                "Argument '" + argument.getName() + "' was not parsed on the matched syntax path. " +
+                "context.get() can only retrieve arguments that are part of the command's own executed syntax."
+        );
     }
 
 }

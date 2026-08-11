@@ -3,6 +3,8 @@ package dev.redgamer6427a.core.commands;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
+import lombok.SneakyThrows;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -32,12 +34,14 @@ public final class ArgumentReader {
      * @param offset the offset.
      * @return the word at that position.
      */
+    @SneakyThrows
     public String readWord(@Range(from = 0, to = Integer.MAX_VALUE) int offset) {
-        
-        
-        return args.get(index + offset);
-
+    int i = index + offset;
+    if (i < 0 || i >= args.size()) {
+        throw new CommandSyntaxException("Expected more input.");
     }
+    return args.get(i);
+}
 
     /**
      * Read a word at a certain offset relative to the parsing process. This offset will increase each time this is called.

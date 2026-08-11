@@ -21,10 +21,13 @@ import java.util.stream.Stream;
 
 /**
  * Represents a file on the filesystem with extended utilities.
- * Provides safe methods for reading, writing, renaming, moving, and querying files.
+ * Provides safe methods for reading, writing, renaming, moving, and querying
+ * files.
  * <p>
- * Factory methods {@link #of(File)}, {@link #of(Path)}, and {@link #of(String)} should be used
- * to create instances. Use {@link #create()} to physically create the file if needed.
+ * Factory methods {@link #of(File)}, {@link #of(Path)}, and {@link #of(String)}
+ * should be used
+ * to create instances. Use {@link #create()} to physically create the file if
+ * needed.
  */
 public class ExtFile {
 
@@ -46,7 +49,9 @@ public class ExtFile {
 
     /**
      * Creates a new ExtFile instance from a {@link File}.
-     * <p>Does not create the file on disk; use {@link #create()} to do so.</p>
+     * <p>
+     * Does not create the file on disk; use {@link #create()} to do so.
+     * </p>
      *
      * @param file The file object to reference.
      * @return A new ExtFile instance.
@@ -57,7 +62,9 @@ public class ExtFile {
 
     /**
      * Creates a new ExtFile instance from a {@link Path}.
-     * <p>Does not create the file on disk; use {@link #create()} to do so.</p>
+     * <p>
+     * Does not create the file on disk; use {@link #create()} to do so.
+     * </p>
      *
      * @param path The path to reference.
      * @return A new ExtFile instance.
@@ -68,10 +75,13 @@ public class ExtFile {
 
     /**
      * Creates a new ExtFile instance from a string path.
-     * <p>Does not create the file on disk; use {@link #create()} to do so.</p>
+     * <p>
+     * Does not create the file on disk; use {@link #create()} to do so.
+     * </p>
      *
      * @param path The string path.
-     * @return An Optional containing the new ExtFile if the path is valid, or empty if invalid.
+     * @return An Optional containing the new ExtFile if the path is valid, or empty
+     *         if invalid.
      */
     public static Optional<ExtFile> of(String path) {
         try {
@@ -83,7 +93,9 @@ public class ExtFile {
 
     /**
      * Reads text from a text files
-     * @return An optional empty if the file does not exist or if it isn't plaintext but the file contents otherwise.
+     * 
+     * @return An optional empty if the file does not exist or if it isn't plaintext
+     *         but the file contents otherwise.
      * @throws IOException if an IO exception occurs.
      */
     public Optional<String> readTextFile() throws IOException {
@@ -97,8 +109,10 @@ public class ExtFile {
 
     /**
      * Read GSON object data from a file
+     * 
      * @param type the type to read.
-     * @return An optional empty if the file does not exist or if it isn't plaintext but the file contents as an object otherwise.
+     * @return An optional empty if the file does not exist or if it isn't plaintext
+     *         but the file contents as an object otherwise.
      * @throws IOException if an IO exception occurs.
      */
     public <T> Optional<T> readGson(TypeToken<T> type) throws IOException {
@@ -111,6 +125,7 @@ public class ExtFile {
 
     /**
      * Writes GSON to a file.
+     * 
      * @param obj the object to gsonify and write.
      * @throws IOException if an IO exception occurs.
      */
@@ -125,10 +140,12 @@ public class ExtFile {
      * @throws IOException if an I/O error occurs.
      */
     public boolean create() throws IOException {
-        if (exists()) return false;
+        if (exists())
+            return false;
 
         Path parent = path.getParent();
-        if (parent != null) Files.createDirectories(parent);
+        if (parent != null)
+            Files.createDirectories(parent);
 
         Files.createFile(path);
         return true;
@@ -141,10 +158,12 @@ public class ExtFile {
      * @throws IOException if an I/O error occurs.
      */
     public boolean createDir() throws IOException {
-        if (exists()) return false;
+        if (exists())
+            return false;
 
         Path parent = path.getParent();
-        if (parent != null) Files.createDirectories(parent);
+        if (parent != null)
+            Files.createDirectories(parent);
 
         Files.createDirectory(path);
         return true;
@@ -161,10 +180,12 @@ public class ExtFile {
 
         return CompletableFuture.runAsync(() -> {
             try {
-                if (Files.exists(path)) throw new IOException("File already exists");
+                if (Files.exists(path))
+                    throw new IOException("File already exists");
 
                 Files.createDirectories(path.getParent());
-                try (InputStream in = url.openStream(); OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW)) {
+                try (InputStream in = url.openStream();
+                        OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW)) {
 
                     long totalBytes = -1;
                     try {
@@ -179,7 +200,8 @@ public class ExtFile {
                     while ((read = in.read(buffer)) != -1) {
                         out.write(buffer, 0, read);
                         bytesRead += read;
-                        if (progressCallback != null) progressCallback.accept(bytesRead, totalBytes);
+                        if (progressCallback != null)
+                            progressCallback.accept(bytesRead, totalBytes);
                     }
                 }
 
@@ -201,8 +223,10 @@ public class ExtFile {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                if (!Files.exists(path)) throw new IOException("File does not exist.");
-                if (!isPlainText()) throw new IOException("Binary file uploads may not be supported.");
+                if (!Files.exists(path))
+                    throw new IOException("File does not exist.");
+                if (!isPlainText())
+                    throw new IOException("Binary file uploads may not be supported.");
 
                 String boundary = "----Boundary" + UUID.randomUUID();
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -215,7 +239,9 @@ public class ExtFile {
 
                 try (OutputStream out = conn.getOutputStream()) {
                     // Multipart header
-                    String header = "--" + boundary + "\r\n" + "Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + path.getFileName() + "\"\r\n" + "Content-Type: application/octet-stream\r\n\r\n";
+                    String header = "--" + boundary + "\r\n" + "Content-Disposition: form-data; name=\"" + fieldName
+                            + "\"; filename=\"" + path.getFileName() + "\"\r\n"
+                            + "Content-Type: application/octet-stream\r\n\r\n";
                     out.write(header.getBytes(StandardCharsets.UTF_8));
 
                     // Stream file
@@ -225,7 +251,8 @@ public class ExtFile {
                         while ((read = in.read(buffer)) != -1) {
                             out.write(buffer, 0, read);
                             bytesUploaded += read;
-                            if (progressCallback != null) progressCallback.accept(bytesUploaded, totalBytes);
+                            if (progressCallback != null)
+                                progressCallback.accept(bytesUploaded, totalBytes);
                         }
                     }
 
@@ -268,7 +295,8 @@ public class ExtFile {
     public String getFileExtension() {
         String name = getFullName();
 
-        if (!name.contains(".")) return "";
+        if (!name.contains("."))
+            return "";
 
         int i = name.lastIndexOf('.');
         return (i > 0 && i < name.length() - 1) ? name.substring(i + 1) : "";
@@ -276,13 +304,16 @@ public class ExtFile {
 
     /**
      * Checks if the file is likely plaintext.
-     * <p>This reads only the first 4 KB of the file to make a guess,
-     * avoiding reading the entire file for large files.</p>
+     * <p>
+     * This reads only the first 4 KB of the file to make a guess,
+     * avoiding reading the entire file for large files.
+     * </p>
      *
      * @return true if the file appears to be plain text; false otherwise.
      */
     public boolean isPlainText() {
-        if (!Files.isRegularFile(path)) return false;
+        if (!Files.isRegularFile(path))
+            return false;
 
         final int MAX_BYTES = 4096;
 
@@ -290,7 +321,8 @@ public class ExtFile {
             byte[] buffer = new byte[MAX_BYTES];
             int bytesRead = in.read(buffer);
 
-            if (bytesRead == -1) return true; // empty file
+            if (bytesRead == -1)
+                return true; // empty file
 
             int printable = 0;
             for (int i = 0; i < bytesRead; i++) {
@@ -310,7 +342,8 @@ public class ExtFile {
     /**
      * Returns direct children of a directory.
      *
-     * @return An array of ExtFile representing direct children; empty if none or if not a directory.
+     * @return An array of ExtFile representing direct children; empty if none or if
+     *         not a directory.
      */
     public ExtFile[] directChildren() {
         try (Stream<Path> stream = Files.list(path)) {
@@ -323,7 +356,8 @@ public class ExtFile {
     /**
      * Returns all children of a directory recursively.
      *
-     * @return An array of ExtFile representing all children; empty if none or if not a directory.
+     * @return An array of ExtFile representing all children; empty if none or if
+     *         not a directory.
      */
     public ExtFile[] allChildren() {
         try (Stream<Path> s = Files.walk(path)) {
@@ -341,23 +375,36 @@ public class ExtFile {
      */
     @SuppressWarnings("UnusedReturnValue")
     public ExtFile[] delete(@Nullable BiConsumer<ExtFile, IOException> IOExHandler) {
-        if (!exists()) return new ExtFile[0];
+        if (!exists())
+            return new ExtFile[0];
 
         if (isDir()) {
             List<ExtFile> list = new ArrayList<>();
             for (ExtFile file : directChildren()) {
                 list.add(file);
-                list.addAll(Arrays.asList(file.allChildren()));
+                ExtFile[] nested = file.allChildren();
+                list.addAll(Arrays.asList(nested));
+                // delete deepest first
+                for (int i = nested.length - 1; i >= 0; i--) {
+                    try {
+                        Files.delete(nested[i].path);
+                    } catch (IOException e) {
+                        if (IOExHandler != null)
+                            IOExHandler.accept(nested[i], e);
+                    }
+                }
                 try {
                     Files.delete(file.path);
                 } catch (IOException e) {
-                    if (IOExHandler != null) IOExHandler.accept(file, e);
+                    if (IOExHandler != null)
+                        IOExHandler.accept(file, e);
                 }
             }
             try {
                 Files.delete(path);
             } catch (IOException e) {
-                if (IOExHandler != null) IOExHandler.accept(this, e);
+                if (IOExHandler != null)
+                    IOExHandler.accept(this, e);
             }
             return list.toArray(ExtFile[]::new);
         } else {
@@ -457,7 +504,6 @@ public class ExtFile {
             path = Files.move(path, newPath, copyOptions);
         }
 
-
     }
 
     /**
@@ -482,15 +528,17 @@ public class ExtFile {
      * @see #create()
      */
     public void writeText(String s, WriteMode writeMode) throws IOException {
-        if (!exists()) throw new IOException("Cannot write to file: use {@link #create()} first.");
-        if (!isPlainText()) throw new IOException("Cannot write text to binary file.");
+        if (!exists())
+            throw new IOException("Cannot write to file: use {@link #create()} first.");
+        if (!isPlainText())
+            throw new IOException("Cannot write text to binary file.");
 
         if (writeMode == WriteMode.OVERWRITE_ALL) {
             new FileOutputStream(path.toFile()).close();
         }
 
-
-        Files.writeString(path, s, writeMode == WriteMode.APPEND ? StandardOpenOption.APPEND : StandardOpenOption.WRITE);
+        Files.writeString(path, s,
+                writeMode == WriteMode.APPEND ? StandardOpenOption.APPEND : StandardOpenOption.WRITE);
     }
 
     /**
@@ -504,17 +552,22 @@ public class ExtFile {
      * @see #create()
      */
     public void writeText(String s, boolean append, int lineNumber, int column) throws IOException {
-        if (!exists()) throw new IOException("Cannot write to file: use create() first.");
-        if (!isPlainText()) throw new IOException("Cannot write text to binary file.");
+        if (!exists())
+            throw new IOException("Cannot write to file: use create() first.");
+        if (!isPlainText())
+            throw new IOException("Cannot write text to binary file.");
 
         List<String> lines = Files.readAllLines(path);
         int lineIndex = lineNumber - 1;
 
-        while (lines.size() <= lineIndex) lines.add("");
+        while (lines.size() <= lineIndex)
+            lines.add("");
         String line = lines.get(lineIndex);
         int col = Math.min(column - 1, line.length());
 
-        String newLine = append ? line.substring(0, col) + s + line.substring(col) : line.substring(0, col) + s + ((col + s.length() < line.length()) ? line.substring(col + s.length()) : "");
+        String newLine = append ? line.substring(0, col) + s + line.substring(col)
+                : line.substring(0, col) + s
+                        + ((col + s.length() < line.length()) ? line.substring(col + s.length()) : "");
         lines.set(lineIndex, newLine);
         Files.write(path, lines);
     }
@@ -530,8 +583,10 @@ public class ExtFile {
      * @throws IOException If the file does not exist or is not plaintext.
      */
     public void replaceRange(String replacement, int fromLine, int fromCol, int toLine, int toCol) throws IOException {
-        if (!exists()) throw new IOException("Cannot write to file: use {@link #create()} first.");
-        if (!isPlainText()) throw new IOException("Cannot modify binary file.");
+        if (!exists())
+            throw new IOException("Cannot write to file: use {@link #create()} first.");
+        if (!isPlainText())
+            throw new IOException("Cannot modify binary file.");
 
         List<String> lines = Files.readAllLines(path);
 
@@ -540,7 +595,8 @@ public class ExtFile {
         int startCol = fromCol - 1;
         int endCol = toCol - 1;
 
-        while (lines.size() <= endLine) lines.add("");
+        while (lines.size() <= endLine)
+            lines.add("");
         startCol = Math.min(startCol, lines.get(startLine).length());
         endCol = Math.min(endCol, lines.get(endLine).length());
 
@@ -550,7 +606,8 @@ public class ExtFile {
         } else {
             String firstLine = lines.get(startLine).substring(0, startCol) + replacement;
             String lastLine = lines.get(endLine).substring(endCol);
-            if (endLine >= startLine + 1) lines.subList(startLine + 1, endLine + 1).clear();
+            if (endLine >= startLine + 1)
+                lines.subList(startLine + 1, endLine + 1).clear();
             lines.set(startLine, firstLine + lastLine);
         }
 
@@ -582,7 +639,8 @@ public class ExtFile {
      * @see #create()
      */
     public void writeBytes(byte[] bytes, WriteMode writeMode) throws IOException {
-        if (!exists()) throw new IOException("Cannot write to file: use {@link #create()} first.");
+        if (!exists())
+            throw new IOException("Cannot write to file: use {@link #create()} first.");
 
         if (writeMode == WriteMode.OVERWRITE_ALL) {
             new FileOutputStream(path.toFile()).close();
@@ -611,7 +669,8 @@ public class ExtFile {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ExtFile other)) return false;
+        if (!(obj instanceof ExtFile other))
+            return false;
         try {
             return path.toRealPath().equals(other.path.toRealPath());
         } catch (IOException e) {
@@ -638,11 +697,12 @@ public class ExtFile {
         return of(path.resolve(fullName));
     }
 
-
     public enum Sorters {
-        TYPE_ASCENDING(Sorters::type, false), TYPE_DESCENDING(Sorters::type, true), CREATION_EARLIEST(Sorters::creationDate, false), CREATION_LATEST(Sorters::creationDate, true), NAME_ASCENDING(Sorters::name, false), NAME_DESCENDING(Sorters::name, true), MODIFICATION_EARLIEST(Sorters::modifiedDate, false), MODIFICATION_LATEST(Sorters::modifiedDate, true),
+        TYPE_ASCENDING(Sorters::type, false), TYPE_DESCENDING(Sorters::type, true),
+        CREATION_EARLIEST(Sorters::creationDate, false), CREATION_LATEST(Sorters::creationDate, true),
+        NAME_ASCENDING(Sorters::name, false), NAME_DESCENDING(Sorters::name, true),
+        MODIFICATION_EARLIEST(Sorters::modifiedDate, false), MODIFICATION_LATEST(Sorters::modifiedDate, true),
         ;
-
 
         final IOThrowingBiFunction<ExtFile, ExtFile, Integer> biFunction;
         final boolean reversed;
@@ -654,7 +714,8 @@ public class ExtFile {
 
         /**
          *
-         * @return the comparison of the file with the lowest file extension. Directories are at the top.
+         * @return the comparison of the file with the lowest file extension.
+         *         Directories are at the top.
          */
         public static int type(@NotNull ExtFile file1, ExtFile file2) {
             if (file1.isDir() && !file2.isDir()) {
@@ -674,7 +735,6 @@ public class ExtFile {
             return file1.fileAttributes().creationTime().compareTo(file2.fileAttributes().creationTime());
 
         }
-
 
         /**
          *
@@ -715,7 +775,6 @@ public class ExtFile {
         }
     }
 
-
     public enum WriteMode {
         /**
          * Append at the end of a file.
@@ -730,8 +789,6 @@ public class ExtFile {
          */
         OVERWRITE_ALL,
 
-
     }
-
 
 }

@@ -15,7 +15,10 @@ import java.util.Map;
 public class LiteralCommandNode extends CommandNode {
 
     private final Map<String, LiteralCommandNode> children = new HashMap<>();
-    private final List<ArgumentNode<?>> arguments = new ArrayList<>();
+    // BUG FIX (framework): was List<ArgumentNode<?>>. Arguments are now stored wrapped
+    // in ArgumentBinding so depth/executor are per-registration, not mutated on the
+    // shared ArgumentNode instance. See ArgumentBinding.
+    private final List<ArgumentBinding<?>> arguments = new ArrayList<>();
     private final String name;
 
 
@@ -65,15 +68,17 @@ public class LiteralCommandNode extends CommandNode {
 
             if (!child.getArguments().isEmpty()) {
                 builder.append(" ");
-                for (ArgumentNode<?> arg : child.getArguments()) {
-                    builder.append(arg.getClass().getCanonicalName());
+                for (ArgumentBinding<?> binding : child.getArguments()) {
+                    builder.append(binding.getNode().getClass().getCanonicalName());
 
-                    if (arg.getExecutor() != null) {
+                    if (binding.getExecutor() != null) {
                         builder.append(" (exec)");
                     }
                     builder.append(", ");
                 }
-                builder.setLength(builder.length() - 1);
+                // BUG FIX: each entry appends ", " (2 chars), but only 1 was being trimmed,
+                // leaving a dangling comma (e.g. "StringArgument, IntegerArgument,").
+                builder.setLength(builder.length() - 2);
             }
 
             builder.append("\n");

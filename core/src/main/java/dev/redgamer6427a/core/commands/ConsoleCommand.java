@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -28,9 +29,16 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
     private Consumer<CommandSyntaxException> syntaxExceptionConsumer;
 
 
-    protected ConsoleCommand(String name, Consumer<CommandSyntaxException> syntaxExceptionConsumer) {
+    protected ConsoleCommand(String name, @Nullable Consumer<CommandSyntaxException> syntaxExceptionConsumer) {
         super(null, null, name);
         this.syntaxExceptionConsumer = syntaxExceptionConsumer;
+    }
+
+    // BUG FIX (framework): builds a wildcard-typed binding without fighting generic
+    // wildcard-capture in the caller. Depth is per-registration; see ArgumentBinding.
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static ArgumentBinding<?> bind(ArgumentNode<?> node, int depth) {
+        return new ArgumentBinding(node, depth);
     }
 
     /**
@@ -52,43 +60,39 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
                 node = new LiteralCommandNode(last, null, name);
             }
 
-//            if (!node.getArguments().isEmpty()) {
-//                throw new IllegalStateException("Node has more than one argument tree");
-//            }
-
             last.addChild(node);
             last = node;
-
-
         }
 
-        LiteralCommandNode finalLast = last;
+        // BUG FIX (framework, root cause): arguments used to be mutated in place
+        // (argumentNode.setDepth(...), argumentNode.setExecutor(...)). Since the same
+        // ArgumentNode instance is routinely reused across multiple addSyntax(...) calls
+        // (e.g. "id" shared by "start" and "quickstart"), a later registration silently
+        // overwrote an earlier one's executor -> wrong lambda fired -> corrupted index
+        // math (the ArrayIndexOutOfBoundsException / "Expected more input" crash chain).
+        // Fix: wrap each argument in a fresh ArgumentBinding owned by THIS registration.
         int finalI = i;
+        List<ArgumentBinding<?>> bindings = Arrays.stream(arguments)
+                .map(node -> bind(node, finalI))
+                .collect(Collectors.toList());
 
-        List<ArgumentNode<?>> processed = List.of(arguments);
+        // De-dupe against whatever's already registered on this literal node at the same
+        // position + name (mirrors prior behavior, without relying on List#indexOf against
+        // ArgumentNode#equals, which breaks when two args in the same call share a name).
+        List<ArgumentBinding<?>> existing = last.getArguments();
+        List<ArgumentBinding<?>> toAdd = new ArrayList<>();
+        for (int idx = 0; idx < bindings.size(); idx++) {
+            ArgumentBinding<?> b = bindings.get(idx);
+            boolean duplicate = idx < existing.size()
+                    && existing.get(idx).getNode().getName().equals(b.getNode().getName());
+            if (!duplicate) {
+                toAdd.add(b);
+            }
+        }
 
-        List<ArgumentNode<?>> finalProcessed = processed;
+        last.getArguments().addAll(toAdd);
 
-        LiteralCommandNode finalLast1 = last;
-        processed = processed.stream()
-                .filter(node -> {
-                    int index = finalProcessed.indexOf(node);
-                    if (finalLast1.getArguments().size() <= index) {
-                        return true;
-                    }
-                    if (index < 0) {
-                        return true;
-                    }
-                    return !node.getName().equals(finalLast1.getArguments().get(index).getName());
-                })
-                .toList();
-
-        last.getArguments().addAll(processed.stream().peek(argumentNode -> {
-            argumentNode.setParent(finalLast);
-            argumentNode.setDepth(finalI);
-        }).toList());
-        processed.stream().toList().getLast().setExecutor(executor);
-
+        bindings.get(bindings.size() - 1).setExecutor(executor);
     }
 
     /**
@@ -97,31 +101,23 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
      * @param arguments the arguments.
      */
     protected void addSyntax(CommandExecutor executor, ArgumentNode<?>... arguments) {
-        List<ArgumentNode<?>> processed = List.of(arguments);
+        List<ArgumentBinding<?>> bindings = Arrays.stream(arguments)
+                .map(node -> bind(node, 0))
+                .collect(Collectors.toList());
 
-        List<ArgumentNode<?>> finalProcessed = processed;
+        List<ArgumentBinding<?>> existing = getArguments();
+        List<ArgumentBinding<?>> toAdd = new ArrayList<>();
+        for (int idx = 0; idx < bindings.size(); idx++) {
+            ArgumentBinding<?> b = bindings.get(idx);
+            boolean duplicate = idx < existing.size()
+                    && existing.get(idx).getNode().getName().equals(b.getNode().getName());
+            if (!duplicate) {
+                toAdd.add(b);
+            }
+        }
 
-        processed = processed.stream()
-                .filter(node -> {
-                    int index = finalProcessed.indexOf(node);
-                    if (getArguments().size() <= index) {
-                        return true;
-                    }
-                    if (index < 0) {
-                        return true;
-                    }
-                    return !node.getName().equals(getArguments().get(index).getName());
-                })
-                .toList();
-
-
-        getArguments().addAll(processed.stream().peek(argumentNode -> {
-            argumentNode.setParent(this);
-            argumentNode.setDepth(0);
-        }).toList());
-
-        Arrays.stream(arguments).toList().getLast().setExecutor(executor);
-
+        getArguments().addAll(toAdd);
+        bindings.get(bindings.size() - 1).setExecutor(executor);
     }
 
     /**
@@ -130,7 +126,7 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
      * @param literals the literals or 'subcommands'.
      */
     protected void addSyntax(CommandExecutor executor, String literals) {
-        String[] stringLiterals = literals.split(" ");
+        String[] stringLiterals = Arrays.stream(literals.split("\\s+")).filter(s -> !s.isEmpty()).toArray(String[]::new);
 
         LiteralCommandNode last = this;
 
@@ -142,13 +138,9 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
 
             last.addChild(node);
             last = node;
-
-
         }
         if (last.executor != null) throw new IllegalStateException("Executor already assigned for syntax: " + literals);
         last.executor = executor;
-
-
     }
     /**
      * Called when a user does not provide any literals or subcommands.
@@ -156,7 +148,6 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
      */
     protected void defaultExecutor(CommandExecutor executor) {
         this.executor = executor;
-
     }
 
     public String toString() {
@@ -171,7 +162,9 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
      */
     public boolean accept(@NotNull String s) {
 
-        List<String> args = Arrays.stream(s.strip().split(" ")).collect(Collectors.toList());
+        List<String> args = Arrays.stream(s.strip().split("\\s+"))
+                .filter(str -> !str.isEmpty())
+                .collect(Collectors.toList());
 
         ExecutionContext context = new ExecutionContext(args);
 
@@ -218,6 +211,7 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
                 }
             } else if (!last.getArguments().isEmpty()) {
                 int relIndex = 0;
+                boolean matched = false;
                 for (int i = iSpecial; i < args.size();) {
 
                     if (relIndex >= last.getArguments().size()) {
@@ -225,23 +219,25 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
                         return true;
                     }
 
-                    ArgumentNode<?> node = last.getArguments().get(relIndex);
+                    ArgumentBinding<?> binding = last.getArguments().get(relIndex);
 
                     relIndex++;
 
                     try {
-                        int generatedOffset = context.parse(node).generatedOffset();
+                        int generatedOffset = context.parse(binding).generatedOffset();
 
                         i += generatedOffset;
                     } catch (CommandSyntaxException e) {
                         syntaxExceptionConsumer.accept(e);
+                        matched = true;
                         break;
                     }
 
 
                     if (i - 1 == args.size() - 1) {
-                        if (node.getExecutor() != null) {
-                            handleExecutor(context, node.getExecutor());
+                        matched = true;
+                        if (binding.getExecutor() != null) {
+                            handleExecutor(context, binding.getExecutor());
                         } else {
                             invalidSyntaxError();
                             return true;
@@ -251,6 +247,11 @@ public abstract class ConsoleCommand extends LiteralCommandNode {
                     }
 
 
+                }
+
+                if (!matched) {
+                    invalidSyntaxError();
+                    return true;
                 }
 
             } else {

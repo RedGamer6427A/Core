@@ -51,7 +51,7 @@ public class StringArgument extends ArgumentNode<String> {
 
     @Override
     protected ParseResult<String> parse(ArgumentReader reader) throws CommandSyntaxException {
-        if (reader.args().size() == 1 && !reader.readWord(0).startsWith("\"")) {
+        if (reader.args().size() - reader.index() == 1 && !reader.readWord(0).startsWith("\"")) {
             return new ParseResult<>(1, reader.readWord());
         }
         if (argumentType == ArgumentType.NORMAL) {
