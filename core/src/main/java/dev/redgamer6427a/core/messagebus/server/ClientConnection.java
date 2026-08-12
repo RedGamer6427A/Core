@@ -70,7 +70,7 @@ public class ClientConnection implements Runnable {
         } catch (SocketTimeoutException e) {
             logger.warning("Client {} timed out before authenticating", socket.getInetAddress().getHostAddress());
         } catch (EOFException e) {
-            logger.info("Connection closed : {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
+            logger.info("Connection closed: {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
         } catch (IOException e) {
             logger.catching("Client connection closed", e);
         } catch (RuntimeException e) {
