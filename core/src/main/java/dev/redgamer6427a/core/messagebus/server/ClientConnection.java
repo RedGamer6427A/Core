@@ -29,13 +29,6 @@ import static dev.redgamer6427a.core.messagebus.MessageBusConstants.*;
  * (name, password, )
  * Message: puts a message on top of the message list to be processed (or ignored) by the destinations
  * <p>
- * ERRORS:
- * 0 - all good
- * 1 - bad pass
- * 2 - bad message json
- * 3 - id already used
- * 4 - not authorized
- * 5 - ratelimited
  */
 
 public class ClientConnection implements Runnable {
@@ -77,7 +70,7 @@ public class ClientConnection implements Runnable {
         } catch (SocketTimeoutException e) {
             logger.warning("Client {} timed out before authenticating", socket.getInetAddress().getHostAddress());
         } catch (EOFException e) {
-            logger.info("Connection closed (EOF) : {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
+            logger.info("Connection closed : {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
         } catch (IOException e) {
             logger.catching("Client connection closed", e);
         } catch (RuntimeException e) {
