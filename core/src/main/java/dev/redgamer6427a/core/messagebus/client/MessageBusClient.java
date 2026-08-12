@@ -8,6 +8,7 @@ import dev.redgamer6427a.core.messagebus.MessageBusBrokerResponse;
 import dev.redgamer6427a.core.messagebus.MessageBusInterface;
 import dev.redgamer6427a.core.messagebus.MessageBusUtil;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.net.ssl.*;
 import java.io.DataInputStream;
@@ -21,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,6 +50,10 @@ public class MessageBusClient implements MessageBusInterface {
     private DataOutputStream out;
     private DataInputStream in;
     private Thread readerThread;
+
+    @Getter
+    @Setter
+    private boolean shouldReconnect = true;
 
     // one slot: sendMessage always waits for its own reply before another can start (see sendLock)
     private final BlockingQueue<byte[]> pendingResponse = new ArrayBlockingQueue<>(1);
@@ -162,6 +169,9 @@ public class MessageBusClient implements MessageBusInterface {
 
         }
     }
+   
+    @Getter
+    private List<Runnable> disconnectListeners = new ArrayList<>();
 
     private void readLoop() {
         try {
@@ -236,6 +246,9 @@ public class MessageBusClient implements MessageBusInterface {
     private final AtomicInteger waitingTime = new AtomicInteger();
 
     private synchronized void reconnect() {
+        if (!shouldReconnect) {
+            disconnectListeners.forEach(Runnable::run);
+        }
         if (reconnectThread.get() != null) return;
 
         close(true);
