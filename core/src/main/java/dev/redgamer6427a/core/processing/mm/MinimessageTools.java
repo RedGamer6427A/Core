@@ -6,7 +6,9 @@ public class MinimessageTools {
 
     public static String createListItem(String name, String hover, String click, List<ItemPart> itemParts) {
 
-        StringBuilder sb = new StringBuilder("<gray><click:"+click+"><hover:show_text:'"+hover+"'>></hover> ");
+        StringBuilder sb = new StringBuilder("<gray> ");
+        if (click != null) sb.append("<click:"+click+">");
+        if (hover != null) sb.append("<hover:show_text:'"+hover+"'>></hover>");
         for (ItemPart itemPart : itemParts) {
 
             sb.append(itemPart.render()).append(" ");
@@ -29,7 +31,11 @@ public class MinimessageTools {
 
         @Override
         public String render() {
-            return "<dark_gray><hover:show_text:'"+hover+"'>["+ text +"<dark_gray>]</hover>";
+            StringBuilder sb = new StringBuilder("<dark_gray>");
+            if (hover != null) sb.append("<hover:show_text:'"+hover+"'>");
+            sb.append("["+ text +"<dark_gray>]");
+            if (hover != null) sb.append("</hover>");
+            return sb.toString();
         }
     }
 
