@@ -8,7 +8,9 @@ public class MinimessageTools {
 
         StringBuilder sb = new StringBuilder("<gray> ");
         if (click != null) sb.append("<click:"+click+">");
-        if (hover != null) sb.append("<hover:show_text:'"+hover+"'>></hover>");
+        if (hover != null) sb.append("<hover:show_text:'"+hover+"'>");
+        sb.append("> ");
+        if (hover != null) sb.append("</hover>");
         for (ItemPart itemPart : itemParts) {
 
             sb.append(itemPart.render()).append(" ");
