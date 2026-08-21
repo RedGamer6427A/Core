@@ -45,7 +45,8 @@ public class MessageBusClient implements MessageBusInterface {
 
     @Getter
     private volatile boolean shouldBeSubscribed = false;
-
+    
+    @Getter
     private SSLSocket socket;
     private DataOutputStream out;
     private DataInputStream in;

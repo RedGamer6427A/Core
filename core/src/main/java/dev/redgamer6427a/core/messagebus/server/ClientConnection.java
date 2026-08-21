@@ -13,6 +13,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -65,12 +66,11 @@ public class ClientConnection implements Runnable {
                 if (frame == null) continue;
                 handle(frame);                      // process
             }
-            logger.info("Connection closed: {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
-
+            logger.fine("Connection closed: {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized); 
         } catch (SocketTimeoutException e) {
-            logger.warning("Client {} timed out before authenticating", socket.getInetAddress().getHostAddress());
-        } catch (EOFException e) {
-            logger.info("Connection closed: {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
+            logger.fine("Client {} timed out before authenticating", socket.getInetAddress().getHostAddress());
+        } catch (SocketException | EOFException e) {
+            logger.fine("Connection closed: {} (ip: {}, authorized: {})", clientId, socket.getInetAddress().getHostAddress(), authorized);
         } catch (IOException e) {
             logger.catching("Client connection closed", e);
         } catch (RuntimeException e) {
@@ -143,7 +143,7 @@ public class ClientConnection implements Runnable {
 
                     authorized = true;
                     socket.setSoTimeout(180_000);
-                    logger.info("Client {} successfully registered (port: {})!", clientId, socket.getPort());
+                    logger.fine("Client {} successfully registered (port: {})!", clientId, socket.getPort());
 
                 } else {
                     this.clientId = clientId;

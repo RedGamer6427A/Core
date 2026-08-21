@@ -220,7 +220,7 @@ public class ConsoleMiniMessage {
 
         return message;
     }
-
+    
     /**
      * Converts 3 long hex integers to 6 long hex integers
      * For example: A3C -> AA33CC
